@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Balveer
+// Narraz Studio is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License.
 using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.UI.Xaml;
@@ -239,9 +243,9 @@ namespace NarrazStudio
             {"ClearAll", "Clear All"},
             {"LocateAll", "Locate All"},
             {"Locate", "Locate"},
-            {"LegalTitle", "Legal & Licenses"},
+            {"LegalTitle", "GNU General Public License v3.0"},
             {"LegalFFmpeg", "FFmpeg is used under the GNU LGPL v2.1+ license for audio chunk merging and post-processing. FFmpeg binaries are bundled in the External folder and are not modified."},
-            {"LegalApp", "Narraz Studio is an open-source project released under the MIT License. You are free to use, modify, and distribute it."},
+            {"LegalApp", "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY."},
             {"LegalEdgeTts", "Audio synthesis is powered by edge-tts, an open-source Python library (MIT License) that uses Microsoft Edge's online TTS service."},
             {"LegalWebView", "The text editor is rendered using Microsoft WebView2 (Edge Chromium), redistributed under Microsoft's WebView2 license terms."},
             {"LegalDisclaimer", "Disclaimer: This software is provided as-is, without any warranty. The developer is not responsible for any data loss or misuse."},
@@ -338,9 +342,9 @@ namespace NarrazStudio
             {"ClearAll", "सब हटाएं"},
             {"LocateAll", "सभी खोजें"},
             {"Locate", "खोजें"},
-            {"LegalTitle", "कानूनी जानकारी और लाइसेंस"},
+            {"LegalTitle", "GNU General Public License v3.0"},
             {"LegalFFmpeg", "FFmpeg का उपयोग GNU LGPL v2.1+ लाइसेंस के अंतर्गत ऑडियो चंक मर्जिंग और पोस्ट-प्रोसेसिंग के लिए किया जाता है। FFmpeg बाइनरी External फ़ोल्डर में शामिल हैं और इनमें कोई बदलाव नहीं किया गया है।"},
-            {"LegalApp", "Narraz Studio एक ओपन-सोर्स प्रोजेक्ट है जो MIT लाइसेंस के तहत जारी किया गया है। आप इसे स्वतंत्र रूप से उपयोग, संशोधित और वितरित कर सकते हैं।"},
+            {"LegalApp", "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY."},
             {"LegalEdgeTts", "ऑडियो सिंथेसिस edge-tts द्वारा संचालित है, जो एक ओपन-सोर्स Python लाइब्रेरी (MIT लाइसेंस) है जो Microsoft Edge की ऑनलाइन TTS सेवा का उपयोग करती है।"},
             {"LegalWebView", "टेक्स्ट एडिटर Microsoft WebView2 (Edge Chromium) का उपयोग करके रेंडर किया जाता है, जो Microsoft की WebView2 लाइसेंस शर्तों के तहत पुनर्वितरित किया गया है।"},
             {"LegalDisclaimer", "अस्वीकरण: यह सॉफ़्टवेयर जैसा है वैसा प्रदान किया गया है, बिना किसी वारंटी के। डेवलपर किसी भी डेटा हानि या दुरुपयोग के लिए ज़िम्मेदार नहीं है।"},
@@ -437,9 +441,9 @@ namespace NarrazStudio
             {"ClearAll", "全部清除"},
             {"LocateAll", "全部定位"},
             {"Locate", "定位"},
-            {"LegalTitle", "法律和许可证"},
+            {"LegalTitle", "GNU General Public License v3.0"},
             {"LegalFFmpeg", "FFmpeg 在 GNU LGPL v2.1+ 许可证下用于音频块合并和后处理。FFmpeg 二进制文件捆绑在 External 文件夹中，未被修改。"},
-            {"LegalApp", "Narraz Studio 是根据 MIT 许可证发布的开源项目。您可以自由使用、修改和分发。"},
+            {"LegalApp", "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY."},
             {"LegalEdgeTts", "音频合成由 edge-tts 提供支持，这是一个使用 Microsoft Edge 在线 TTS 服务的开源 Python 库（MIT 许可证）。"},
             {"LegalWebView", "文本编辑器使用 Microsoft WebView2（Edge Chromium）呈现，并根据 Microsoft 的 WebView2 许可条款重新分发。"},
             {"LegalDisclaimer", "免责声明：本软件按“原样”提供，没有任何保证。开发者对任何数据丢失或滥用不承担任何责任。"},
@@ -536,9 +540,9 @@ namespace NarrazStudio
             {"ClearAll", "سب صاف کریں"},
             {"LocateAll", "سب تلاش کریں"},
             {"Locate", "تلاش کریں"},
-            {"LegalTitle", "قانونی معلومات اور لائسنس"},
+            {"LegalTitle", "GNU General Public License v3.0"},
             {"LegalFFmpeg", "FFmpeg آڈیو حصوں کو ملانے اور پوسٹ پروسیسنگ کے لیے GNU LGPL v2.1+ لائسنس کے تحت استعمال ہوتا ہے۔ FFmpeg بائنریز External فولڈر میں شامل ہیں اور ان میں کوئی ترمیم نہیں کی گئی ہے۔"},
-            {"LegalApp", "Narraz Studio ایک اوپن سورس پروجیکٹ ہے جو MIT لائسنس کے تحت جاری کیا گیا ہے۔ آپ اسے آزادانہ طور پر استعمال، ترمیم، اور تقسیم کر سکتے ہیں۔"},
+            {"LegalApp", "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY."},
             {"LegalEdgeTts", "آڈیو کی ترکیب edge-tts کے ذریعے چلائی جاتی ہے، جو ایک اوپن سورس پائتھون لائبریری (MIT لائسنس) ہے اور مائیکروسافٹ ایج کی آن لائن TTS سروس استعمال کرتی ہے۔"},
             {"LegalWebView", "متن کے ایڈیٹر کو مائیکروسافٹ WebView2 (Edge Chromium) کے ذریعے رینڈر کیا گیا ہے، جسے مائیکروسافٹ کے WebView2 لائسنس کی شرائط کے تحت دوبارہ تقسیم کیا گیا ہے۔"},
             {"LegalDisclaimer", "ڈس کلیمر: یہ سافٹ ویئر جیسا ہے کی بنیاد پر فراہم کیا گیا ہے، بغیر کسی وارنٹی کے۔ ڈویلپر کسی بھی ڈیٹا کے نقصان یا غلط استعمال کا ذمہ دار نہیں ہے۔"},
@@ -549,4 +553,5 @@ namespace NarrazStudio
         };
     }
 }
+
 

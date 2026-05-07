@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Balveer
+// Narraz Studio is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License.
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Runtime.InteropServices;
@@ -1662,3 +1666,4 @@ namespace NarrazStudio
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }
+

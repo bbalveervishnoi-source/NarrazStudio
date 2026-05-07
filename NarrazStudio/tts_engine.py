@@ -1,3 +1,7 @@
+# Copyright (C) 2026 Balveer
+# Narraz Studio is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License.
 import asyncio
 import edge_tts
 import sys
@@ -254,3 +258,4 @@ if __name__ == "__main__":
             print("RESULT: ERROR - " + str(e))
             sys.stderr.write(traceback.format_exc())
             sys.exit(1)
+

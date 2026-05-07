@@ -61,11 +61,13 @@ If you want to build the project from source or contribute:
 
 ## ⚖️ License & Legal
 
-Narraz Studio is **100% free** and open-source.
-*   **Codebase**: Free to modify and distribute.
+Narraz Studio is **100% free** and open-source under the **GPL v3 License**.
+*   **Codebase**: Free to modify and distribute under GPL v3 terms.
 *   **Edge-TTS**: Operates via the open-source python wrapper.
 *   **FFmpeg**: Used under the GPL/LGPL license.
 *   **Commercial Use**: You are free to use the generated audio for commercial purposes (YouTube, Podcasts, Audiobooks) as there are no paid constraints or proprietary restrictions built into the codebase.
+
+**Important Note:** Narraz Studio is protected under the GPL v3 License. Any redistribution or rebranding of this software on the Microsoft Store or any other platform without proper attribution and adherence to GPL v3 terms is strictly prohibited.
 
 ---
 <div align="center">
