@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -16,7 +16,7 @@
   <mp:PhoneIdentity PhoneProductId="510ce136-4b20-4923-9409-c06b84612093" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Narraz Studio</DisplayName>
+    <DisplayName>Narraz</DisplayName>
     <PublisherDisplayName>Balveer</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
