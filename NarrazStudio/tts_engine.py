@@ -14,6 +14,10 @@ import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
+# Per-chunk timeout in seconds. If a chunk takes longer, it is retried.
+CHUNK_TIMEOUT_SECONDS = 45
+MAX_RETRIES = 2
+
 async def list_voices():
     voices = await edge_tts.VoicesManager.create()
     relevant_voices = []
@@ -26,6 +30,72 @@ async def list_voices():
         })
     print(json.dumps(relevant_voices))
 
+def _normalize_rate_pitch(rate: str, pitch: str):
+    """
+    Ensure rate and pitch are in the exact format edge-tts expects:
+    rate  -> '+0%'  (always has sign, ends with %)
+    pitch -> '+0Hz' (always has sign, ends with Hz)
+    This prevents NoAudioReceived errors on non-English voices.
+    """
+    def add_sign(s: str, suffix: str) -> str:
+        s = s.strip()
+        # Strip suffix if already present
+        if s.endswith(suffix):
+            s = s[:-len(suffix)]
+        try:
+            val = int(float(s))
+        except (ValueError, TypeError):
+            val = 0
+        sign = "+" if val >= 0 else ""
+        return f"{sign}{val}{suffix}"
+
+    return add_sign(rate, "%"), add_sign(pitch, "Hz")
+
+async def _generate_chunk_with_retry(i, chunk, voice, rate, pitch, temp_folder, total_chunks):
+    """Generate a single audio chunk with timeout and retry logic."""
+    temp_file = os.path.join(temp_folder, f"chunk_{i}.mp3")
+    last_error = None
+
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            if attempt > 0:
+                print(f"STATUS: Retrying chunk {i+1}/{total_chunks} (attempt {attempt+1})...")
+                sys.stdout.flush()
+                await asyncio.sleep(2)  # Brief pause before retry
+
+            communicate = edge_tts.Communicate(chunk, voice, rate=rate, pitch=pitch)
+
+            # Write with a hard timeout so a hung network call doesn't block forever
+            await asyncio.wait_for(communicate.save(temp_file), timeout=CHUNK_TIMEOUT_SECONDS)
+
+            # Verify file is non-empty
+            if not os.path.exists(temp_file) or os.path.getsize(temp_file) == 0:
+                raise Exception(f"Generated chunk {i+1} is empty — voice may not support this text/language combination.")
+
+            return i, temp_file
+
+        except asyncio.TimeoutError:
+            last_error = f"Chunk {i+1} timed out after {CHUNK_TIMEOUT_SECONDS}s (network issue or unsupported voice/language)"
+            print(f"STATUS: Timeout on chunk {i+1}, attempt {attempt+1}...")
+            sys.stdout.flush()
+            # Remove partial file if it exists
+            if os.path.exists(temp_file):
+                try:
+                    os.remove(temp_file)
+                except Exception:
+                    pass
+        except Exception as e:
+            last_error = str(e)
+            print(f"STATUS: Error on chunk {i+1}, attempt {attempt+1}: {e}")
+            sys.stdout.flush()
+            if os.path.exists(temp_file):
+                try:
+                    os.remove(temp_file)
+                except Exception:
+                    pass
+
+    raise Exception(f"Chunk {i+1} failed after {MAX_RETRIES+1} attempts. Last error: {last_error}")
+
 async def process_chunks(config, ffmpeg_path):
     try:
         print("STATUS: CONFIG: " + json.dumps(config, ensure_ascii=False))
@@ -36,9 +106,14 @@ async def process_chunks(config, ffmpeg_path):
     text_file = config.get('text_file', '')
     voice = config['voice']
     output_final = config['output_file']
-    rate = config['rate']
-    pitch = config['pitch']
+    raw_rate = config.get('rate', '+0%')
+    raw_pitch = config.get('pitch', '+0Hz')
     ffmpeg_exe = os.path.join(ffmpeg_path, "ffmpeg.exe")
+
+    # Normalize rate/pitch to prevent edge-tts NoAudioReceived on non-English voices
+    rate, pitch = _normalize_rate_pitch(raw_rate, raw_pitch)
+    print(f"STATUS: Voice={voice} Rate={rate} Pitch={pitch}")
+    sys.stdout.flush()
 
     # Resolve text_file to an absolute path using several fallback locations
     candidates_tried = []
@@ -145,20 +220,11 @@ async def process_chunks(config, ffmpeg_path):
             async with semaphore:
                 print(f"STATUS: Processing chunk {i+1}/{total_chunks} in parallel...")
                 sys.stdout.flush()
-                temp_file = os.path.join(temp_folder, f"chunk_{i}.mp3")
-                communicate = edge_tts.Communicate(chunk, voice, rate=rate, pitch=pitch)
-                await communicate.save(temp_file)
+                result = await _generate_chunk_with_retry(i, chunk, voice, rate, pitch, temp_folder, total_chunks)
                 completed_chunks += 1
                 print(f"STATUS: Completed chunk {completed_chunks}/{total_chunks}")
                 sys.stdout.flush()
-                try:
-                    if os.path.exists(temp_file) and os.path.getsize(temp_file) == 0:
-                        raise Exception(f"Generated chunk is empty: {temp_file}")
-                except Exception as _e:
-                    print(f"RESULT: ERROR - {_e}")
-                    sys.stdout.flush()
-                    raise
-                return i, temp_file
+                return result
 
         print(f"STATUS: Starting parallel generation for {total_chunks} chunks...")
         sys.stdout.flush()
@@ -166,7 +232,7 @@ async def process_chunks(config, ffmpeg_path):
         # Run all chunk tasks concurrently and sort by index
         tasks = [_generate_chunk(i, chunk) for i, chunk in enumerate(text_chunks)]
         results = await asyncio.gather(*tasks)
-        results.sort(key=lambda x: x[0])
+        results = sorted(results, key=lambda x: x[0])
 
         for index, temp_file in results:
             temp_files.append(temp_file)
@@ -258,4 +324,3 @@ if __name__ == "__main__":
             print("RESULT: ERROR - " + str(e))
             sys.stderr.write(traceback.format_exc())
             sys.exit(1)
-
