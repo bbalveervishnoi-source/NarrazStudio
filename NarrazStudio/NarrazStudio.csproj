@@ -69,7 +69,9 @@
     <!-- Signing disabled: Microsoft Store signs the package on their servers -->
     <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <!-- Disable symbol/PDB packaging to avoid mspdbcmf.exe build error -->
+    <GenerateTestArtifacts>False</GenerateTestArtifacts>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <AppxBundle>Always</AppxBundle>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <!-- x64 only: bundled Engine binaries (ffmpeg, tts_engine) are 64-bit -->
