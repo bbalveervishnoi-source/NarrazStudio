@@ -464,7 +464,7 @@ namespace NarrazStudio
         // Detect and display FFmpeg availability
         private void CheckFFmpegStatus()
         {
-            string ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "External", "ffmpeg.exe");
+            string ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Engine", "ffmpeg.exe");
             bool exists = File.Exists(ffmpegPath);
             DispatcherQueue.TryEnqueue(() => {
                 if (FFmpegStatusIcon != null) {
