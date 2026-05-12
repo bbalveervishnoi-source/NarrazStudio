@@ -494,10 +494,32 @@
                                     </Button>
                                 </Grid>
                             </Border>
+                            <!-- Send Feedback -->
+                            <Border Background="{ThemeResource ControlFillColorDefaultBrush}" CornerRadius="8" Padding="14,10" Margin="0,4,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Text="{x:Bind Lang.FeedbackTitle, Mode=OneWay}" FontSize="12" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{x:Bind Lang.FeedbackDesc, Mode=OneWay}" FontSize="11" Opacity="0.6" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <Button x:Name="FeedbackContentBtn" Grid.Column="1" Click="FeedbackContent_Click"
+                                            Background="#1A7A5E" Foreground="White"
+                                            CornerRadius="8" Padding="12,6" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xED15;" FontSize="12" Foreground="White"/>
+                                            <TextBlock Text="{x:Bind Lang.FeedbackBtn, Mode=OneWay}" FontSize="12"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </ScrollViewer>
+
         </Grid>
 
         <!-- Full Screen Batch View -->

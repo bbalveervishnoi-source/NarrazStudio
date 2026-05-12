@@ -161,6 +161,11 @@ namespace NarrazStudio
         public string ReportPickEmailTitle => this["ReportPickEmailTitle"];
         public string ReportPickEmailDesc => this["ReportPickEmailDesc"];
         public string ReportViaOther => this["ReportViaOther"];
+        public string FeedbackTitle => this["FeedbackTitle"];
+        public string FeedbackDesc => this["FeedbackDesc"];
+        public string FeedbackBtn => this["FeedbackBtn"];
+        public string FeedbackPickEmailTitle => this["FeedbackPickEmailTitle"];
+        public string FeedbackPickEmailDesc => this["FeedbackPickEmailDesc"];
 
         private Dictionary<string, string> _english = new()
         {
@@ -264,7 +269,16 @@ namespace NarrazStudio
             {"ReportContentBtn", "Report"},
             {"ReportPickEmailTitle", "Choose Your Email App"},
             {"ReportPickEmailDesc", "Select an email service to send your report to balveer09@outlook.com:"},
-            {"ReportViaOther", "Open with installed app..."}
+            {"ReportViaOther", "Open with installed app..."},
+            {"ReportEmailSubject", "Narraz Studio: Report Inappropriate AI Content"},
+            {"ReportEmailBody", "Hello,\n\nI would like to report the following AI-generated content from Narraz Studio as inappropriate or harmful:\n\n[Please describe the content here]\n\nApp Version: Narraz Studio Beta\nThank you."},
+            {"FeedbackTitle", "Send Feedback"},
+            {"FeedbackDesc", "Share your suggestions, ideas, or experience with the developer."},
+            {"FeedbackBtn", "Feedback"},
+            {"FeedbackPickEmailTitle", "Choose Your Email App"},
+            {"FeedbackPickEmailDesc", "Select an email service to send your feedback to balveer09@outlook.com:"},
+            {"FeedbackEmailSubject", "Narraz Studio: Feedback"},
+            {"FeedbackEmailBody", "Hello,\n\nHere is my feedback for Narraz Studio:\n\n[Please share your thoughts, suggestions, or ideas here]\n\nApp Version: Narraz Studio Beta\nThank you."}
         };
 
         private Dictionary<string, string> _hindi = new()
@@ -369,7 +383,16 @@ namespace NarrazStudio
             {"ReportContentBtn", "रिपोर्ट करें"},
             {"ReportPickEmailTitle", "अपना ईमेल ऐप चुनें"},
             {"ReportPickEmailDesc", "balveer09@outlook.com पर रिपोर्ट भेजने के लिए एक ईमेल सेवा चुनें:"},
-            {"ReportViaOther", "इंस्टॉल ऐप से खोलें..."}
+            {"ReportViaOther", "इंस्टॉल ऐप से खोलें..."},
+            {"ReportEmailSubject", "Narraz Studio: अनुचित AI कंटेंट की रिपोर्ट"},
+            {"ReportEmailBody", "नमस्ते,\n\nमैं Narraz Studio में AI द्वारा बनाई गई निम्नलिखित सामग्री को अनुचित या हानिकारक के रूप में रिपोर्ट करना चाहता/चाहती हूँ:\n\n[यहाँ विवरण लिखें]\n\nऐप संस्करण: Narraz Studio Beta\nधन्यवाद।"},
+            {"FeedbackTitle", "फ़ीडबैक भेजें"},
+            {"FeedbackDesc", "अपने सुझाव, विचार या अनुभव डेवलपर के साथ साझा करें।"},
+            {"FeedbackBtn", "फ़ीडबैक"},
+            {"FeedbackPickEmailTitle", "अपना ईमेल ऐप चुनें"},
+            {"FeedbackPickEmailDesc", "balveer09@outlook.com पर फ़ीडबैक भेजने के लिए एक ईमेल सेवा चुनें:"},
+            {"FeedbackEmailSubject", "Narraz Studio: फ़ीडबैक"},
+            {"FeedbackEmailBody", "नमस्ते,\n\nNarraz Studio के लिए मेरा फ़ीडबैक:\n\n[यहाँ अपने विचार, सुझाव या विचार साझा करें]\n\nऐप संस्करण: Narraz Studio Beta\nधन्यवाद।"}
         };
 
         private Dictionary<string, string> _chinese = new()
@@ -474,7 +497,16 @@ namespace NarrazStudio
             {"ReportContentBtn", "举报"},
             {"ReportPickEmailTitle", "选择您的电子邮件应用"},
             {"ReportPickEmailDesc", "选择一个电子邮件服务将您的举报发送至 balveer09@outlook.com："},
-            {"ReportViaOther", "使用已安装的应用打开..."}
+            {"ReportViaOther", "使用已安装的应用打开..."},
+            {"ReportEmailSubject", "Narraz Studio：举报不当 AI 内容"},
+            {"ReportEmailBody", "您好，\n\n我想举报 Narraz Studio 中 AI 生成的以下内容为不当或有害内容：\n\n[请在此填写详情]\n\n应用版本：Narraz Studio Beta\n谢谢。"},
+            {"FeedbackTitle", "发送反馈"},
+            {"FeedbackDesc", "与开发者分享您的建议、想法或使用体验。"},
+            {"FeedbackBtn", "反馈"},
+            {"FeedbackPickEmailTitle", "选择您的电子邮件应用"},
+            {"FeedbackPickEmailDesc", "选择一个电子邮件服务将您的反馈发送至 balveer09@outlook.com："},
+            {"FeedbackEmailSubject", "Narraz Studio：用户反馈"},
+            {"FeedbackEmailBody", "您好，\n\n以下是我对 Narraz Studio 的反馈：\n\n[请在此分享您的想法、建议或意见]\n\n应用版本：Narraz Studio Beta\n谢谢。"}
         };
 
         private Dictionary<string, string> _urdu = new()
@@ -579,7 +611,16 @@ namespace NarrazStudio
             {"ReportContentBtn", "اطلاع دیں"},
             {"ReportPickEmailTitle", "اپنی ای میل ایپ چنیں"},
             {"ReportPickEmailDesc", "balveer09@outlook.com پر رپورٹ بھیجنے کے لیے ایک ای میل سروس منتخب کریں:"},
-            {"ReportViaOther", "نصب شدہ ایپ سے کھولیں..."}
+            {"ReportViaOther", "نصب شدہ ایپ سے کھولیں..."},
+            {"ReportEmailSubject", "Narraz Studio: نامناسب AI مواد کی اطلاع"},
+            {"ReportEmailBody", "السلام علیکم،\n\nمیں Narraz Studio میں AI سے تیار کردہ درج ذیل مواد کو نامناسب یا نقصاندہ قرار دے کر اطلاع دینا چاہتا/چاہتی ہوں:\n\n[براہ کرم یہاں تفصیل لکھیں]\n\nایپ ورژن: Narraz Studio Beta\nشکریہ۔"},
+            {"FeedbackTitle", "فیڈ بیک بھیجیں"},
+            {"FeedbackDesc", "اپنے مشورے، خیالات یا تجربے ڈویلپر کے ساتھ شیئر کریں۔"},
+            {"FeedbackBtn", "فیڈ بیک"},
+            {"FeedbackPickEmailTitle", "اپنی ای میل ایپ چنیں"},
+            {"FeedbackPickEmailDesc", "balveer09@outlook.com پر فیڈ بیک بھیجنے کے لیے ایک ای میل سروس منتخب کریں:"},
+            {"FeedbackEmailSubject", "Narraz Studio: فیڈ بیک"},
+            {"FeedbackEmailBody", "السلام علیکم،\n\nNarraz Studio کے بارے میں میرا فیڈ بیک:\n\n[براہ کرم یہاں اپنے خیالات، مشورے یا رائے شیئر کریں]\n\nایپ ورژن: Narraz Studio Beta\nشکریہ۔"}
         };
     }
 }

@@ -582,29 +582,25 @@ namespace NarrazStudio
             await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtube.com/@HeartNovelsHindiFM"));
         }
 
-        // Policy 11.16: Report Inappropriate AI-Generated Content — in-app email picker
-        private async void ReportContent_Click(object sender, RoutedEventArgs e)
+        // Shared helper: shows in-app email picker dialog and launches chosen service
+        private async Task ShowEmailPickerAsync(
+            string dialogTitleKey, string dialogDescKey,
+            string emailSubject, string emailBody)
         {
             var lang = LanguageManager.Instance;
-            string to      = "balveer09@outlook.com";
-            string subject = Uri.EscapeDataString("Narraz Studio: Report Inappropriate AI Content");
-            string body    = Uri.EscapeDataString(
-                "Hello,\n\n" +
-                "I would like to report the following AI-generated content from Narraz Studio as inappropriate or harmful:\n\n" +
-                "[Please describe the content here]\n\n" +
-                "Thank you.");
+            string to = "balveer09@outlook.com";
+            string subject = Uri.EscapeDataString(emailSubject);
+            string body    = Uri.EscapeDataString(emailBody);
 
-            // Build the dialog content programmatically
             var panel = new StackPanel { Spacing = 6 };
             panel.Children.Add(new TextBlock
             {
-                Text = lang["ReportPickEmailDesc"],
+                Text = lang[dialogDescKey],
                 TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                 Opacity = 0.7,
                 Margin = new Microsoft.UI.Xaml.Thickness(0, 0, 0, 6)
             });
 
-            // (label, web-compose URL or null for Open With picker)
             var options = new (string Label, string? Url, string Glyph)[]
             {
                 ("Gmail",       $"https://mail.google.com/mail/?view=cm&to={to}&su={subject}&body={body}", "\uE715"),
@@ -615,13 +611,12 @@ namespace NarrazStudio
 
             var dialog = new ContentDialog
             {
-                Title       = lang["ReportPickEmailTitle"],
+                Title           = lang[dialogTitleKey],
                 CloseButtonText = lang["Cancel"],
-                XamlRoot    = this.Content.XamlRoot,
-                DefaultButton = ContentDialogButton.Close
+                XamlRoot        = this.Content.XamlRoot,
+                DefaultButton   = ContentDialogButton.Close
             };
 
-            // Button click closes dialog and launches the chosen service
             string? chosenUrl = null;
             bool usePickerApp = false;
 
@@ -630,17 +625,17 @@ namespace NarrazStudio
                 var btn = new Button
                 {
                     HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Stretch,
-                    Padding   = new Microsoft.UI.Xaml.Thickness(16, 10, 16, 10),
+                    Padding      = new Microsoft.UI.Xaml.Thickness(16, 10, 16, 10),
                     CornerRadius = new Microsoft.UI.Xaml.CornerRadius(8),
-                    Margin    = new Microsoft.UI.Xaml.Thickness(0, 2, 0, 2),
+                    Margin       = new Microsoft.UI.Xaml.Thickness(0, 2, 0, 2),
                 };
                 var row = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
                 row.Children.Add(new FontIcon { Glyph = glyph, FontSize = 16 });
                 row.Children.Add(new TextBlock { Text = label, FontSize = 14, VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center });
                 btn.Content = row;
 
-                var capturedUrl     = url;
-                var capturedPicker  = (url == null);
+                var capturedUrl    = url;
+                var capturedPicker = (url == null);
                 btn.Click += (s, _) =>
                 {
                     chosenUrl    = capturedUrl;
@@ -655,15 +650,34 @@ namespace NarrazStudio
 
             if (usePickerApp)
             {
-                // Force Windows "Open With" chooser — never opens a blank browser tab
                 var opts = new Windows.System.LauncherOptions { DisplayApplicationPicker = true };
-                var mailtoUri = new Uri($"mailto:{to}?subject={subject}&body={body}");
-                await Windows.System.Launcher.LaunchUriAsync(mailtoUri, opts);
+                await Windows.System.Launcher.LaunchUriAsync(
+                    new Uri($"mailto:{to}?subject={subject}&body={body}"), opts);
             }
             else if (chosenUrl != null)
             {
                 await Windows.System.Launcher.LaunchUriAsync(new Uri(chosenUrl));
             }
+        }
+
+        // Policy 11.16: Report Inappropriate AI-Generated Content
+        private async void ReportContent_Click(object sender, RoutedEventArgs e)
+        {
+            var lang = LanguageManager.Instance;
+            await ShowEmailPickerAsync(
+                "ReportPickEmailTitle", "ReportPickEmailDesc",
+                lang["ReportEmailSubject"],
+                lang["ReportEmailBody"]);
+        }
+
+        // Send Feedback to developer
+        private async void FeedbackContent_Click(object sender, RoutedEventArgs e)
+        {
+            var lang = LanguageManager.Instance;
+            await ShowEmailPickerAsync(
+                "FeedbackPickEmailTitle", "FeedbackPickEmailDesc",
+                lang["FeedbackEmailSubject"],
+                lang["FeedbackEmailBody"]);
         }
 
         // History filter by date period
