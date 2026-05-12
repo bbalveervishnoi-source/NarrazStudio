@@ -155,6 +155,9 @@ namespace NarrazStudio
         public string DevName => this["DevName"];
         public string DevVersion => this["DevVersion"];
         public string SaveAndExit => this["SaveAndExit"];
+        public string ReportContentTitle => this["ReportContentTitle"];
+        public string ReportContentDesc => this["ReportContentDesc"];
+        public string ReportContentBtn => this["ReportContentBtn"];
 
         private Dictionary<string, string> _english = new()
         {
@@ -252,7 +255,10 @@ namespace NarrazStudio
             {"LegalPrivacy", "Privacy: Narraz Studio does not collect, store, or transmit any personal data. All processing happens locally on your device. Text is sent to Microsoft's TTS service for audio synthesis only."},
             {"DevName", "Balveer Vishnoi"},
             {"DevVersion", "Narraz Studio Beta"},
-            {"SaveAndExit", "Save & Exit Settings"}
+            {"SaveAndExit", "Save & Exit Settings"},
+            {"ReportContentTitle", "Report Inappropriate Content"},
+            {"ReportContentDesc", "If you encounter AI-generated content that is harmful or inappropriate, please report it."},
+            {"ReportContentBtn", "Report"}
         };
 
         private Dictionary<string, string> _hindi = new()
@@ -351,7 +357,10 @@ namespace NarrazStudio
             {"LegalPrivacy", "गोपनीयता: Narraz Studio कोई भी व्यक्तिगत डेटा एकत्र, संग्रहीत या प्रसारित नहीं करता है। सारी प्रोसेसिंग आपके डिवाइस पर स्थानीय रूप से होती है। टेक्स्ट केवल ऑडियो सिंथेसिस के लिए Microsoft की TTS सेवा को भेजा जाता है।"},
             {"DevName", "बलवीर विष्णोई"},
             {"DevVersion", "Narraz Studio Beta"},
-            {"SaveAndExit", "सेटिंग्स सेव करें और बाहर जाएं"}
+            {"SaveAndExit", "सेटिंग्स सेव करें और बाहर जाएं"},
+            {"ReportContentTitle", "अनुचित कंटेंट की रिपोर्ट करें"},
+            {"ReportContentDesc", "अगर AI द्वारा बनाया गया कंटेंट हानिकारक या अनुचित लगे, तो कृपया इसकी रिपोर्ट करें।"},
+            {"ReportContentBtn", "रिपोर्ट करें"}
         };
 
         private Dictionary<string, string> _chinese = new()
@@ -450,7 +459,10 @@ namespace NarrazStudio
             {"LegalPrivacy", "隐私：Narraz Studio 不会收集、存储或传输任何个人数据。所有处理均在您的设备上本地进行。文本仅发送到 Microsoft 的 TTS 服务以进行音频合成。"},
             {"DevName", "Balveer Vishnoi"},
             {"DevVersion", "Narraz Studio Beta"},
-            {"SaveAndExit", "保存并退出设置"}
+            {"SaveAndExit", "保存并退出设置"},
+            {"ReportContentTitle", "举报不当内容"},
+            {"ReportContentDesc", "如果您遇到有害或不当的 AI 生成内容，请举报。"},
+            {"ReportContentBtn", "举报"}
         };
 
         private Dictionary<string, string> _urdu = new()
@@ -549,7 +561,10 @@ namespace NarrazStudio
             {"LegalPrivacy", "پرائیویسی: Narraz Studio کوئی بھی ذاتی ڈیٹا اکٹھا، محفوظ، یا منتقل نہیں کرتا ہے۔ تمام پروسیسنگ مقامی طور پر آپ کے آلے پر ہوتی ہے۔ متن صرف آڈیو ترکیب کے لیے مائیکروسافٹ کی TTS سروس کو بھیجا جاتا ہے۔"},
             {"DevName", "بلویر وشنوئی"},
             {"DevVersion", "Narraz Studio Beta"},
-            {"SaveAndExit", "محفوظ کریں اور ترتیبات سے باہر نکلیں"}
+            {"SaveAndExit", "محفوظ کریں اور ترتیبات سے باہر نکلیں"},
+            {"ReportContentTitle", "نامناسب مواد کی اطلاع دیں"},
+            {"ReportContentDesc", "اگر AI سے بنایا گیا مواد نقصاندہ یا نامناسب لگے تو براہ کرم اطلاع دیں۔"},
+            {"ReportContentBtn", "اطلاع دیں"}
         };
     }
 }

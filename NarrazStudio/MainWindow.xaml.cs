@@ -582,6 +582,19 @@ namespace NarrazStudio
             await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtube.com/@HeartNovelsHindiFM"));
         }
 
+        // Policy 11.16: Report Inappropriate AI-Generated Content
+        private async void ReportContent_Click(object sender, RoutedEventArgs e)
+        {
+            string subject = Uri.EscapeDataString("Narraz Studio: Report Inappropriate AI Content");
+            string body = Uri.EscapeDataString(
+                "Hello,\n\n" +
+                "I would like to report the following AI-generated content from Narraz Studio as inappropriate or harmful:\n\n" +
+                "[Please describe the content here]\n\n" +
+                "Thank you.");
+            await Windows.System.Launcher.LaunchUriAsync(
+                new Uri($"mailto:balveer09@outlook.com?subject={subject}&body={body}"));
+        }
+
         // History filter by date period
         private void FilterDateSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

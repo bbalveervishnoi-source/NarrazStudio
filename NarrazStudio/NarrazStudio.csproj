@@ -78,4 +78,8 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <GenerateTemporaryStoreCertificate>False</GenerateTemporaryStoreCertificate>
   </PropertyGroup>
+
+  <!-- Override the FastLink PDB task to prevent mspdbcmf.exe not found error -->
+  <Target Name="WinAppSdkCheckFastlinkPdb" />
+
 </Project>
