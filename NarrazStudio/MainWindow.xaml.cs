@@ -582,17 +582,88 @@ namespace NarrazStudio
             await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtube.com/@HeartNovelsHindiFM"));
         }
 
-        // Policy 11.16: Report Inappropriate AI-Generated Content
+        // Policy 11.16: Report Inappropriate AI-Generated Content — in-app email picker
         private async void ReportContent_Click(object sender, RoutedEventArgs e)
         {
+            var lang = LanguageManager.Instance;
+            string to      = "balveer09@outlook.com";
             string subject = Uri.EscapeDataString("Narraz Studio: Report Inappropriate AI Content");
-            string body = Uri.EscapeDataString(
+            string body    = Uri.EscapeDataString(
                 "Hello,\n\n" +
                 "I would like to report the following AI-generated content from Narraz Studio as inappropriate or harmful:\n\n" +
                 "[Please describe the content here]\n\n" +
                 "Thank you.");
-            await Windows.System.Launcher.LaunchUriAsync(
-                new Uri($"mailto:balveer09@outlook.com?subject={subject}&body={body}"));
+
+            // Build the dialog content programmatically
+            var panel = new StackPanel { Spacing = 6 };
+            panel.Children.Add(new TextBlock
+            {
+                Text = lang["ReportPickEmailDesc"],
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                Opacity = 0.7,
+                Margin = new Microsoft.UI.Xaml.Thickness(0, 0, 0, 6)
+            });
+
+            // (label, web-compose URL or null for Open With picker)
+            var options = new (string Label, string? Url, string Glyph)[]
+            {
+                ("Gmail",       $"https://mail.google.com/mail/?view=cm&to={to}&su={subject}&body={body}", "\uE715"),
+                ("Outlook Web", $"https://outlook.live.com/mail/0/deeplink/compose?to={to}&subject={subject}&body={body}", "\uE715"),
+                ("Yahoo Mail",  $"https://compose.mail.yahoo.com/?to={to}&subject={subject}&body={body}", "\uE715"),
+                (lang["ReportViaOther"], null, "\uE8F4"),
+            };
+
+            var dialog = new ContentDialog
+            {
+                Title       = lang["ReportPickEmailTitle"],
+                CloseButtonText = lang["Cancel"],
+                XamlRoot    = this.Content.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            // Button click closes dialog and launches the chosen service
+            string? chosenUrl = null;
+            bool usePickerApp = false;
+
+            foreach (var (label, url, glyph) in options)
+            {
+                var btn = new Button
+                {
+                    HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Stretch,
+                    Padding   = new Microsoft.UI.Xaml.Thickness(16, 10, 16, 10),
+                    CornerRadius = new Microsoft.UI.Xaml.CornerRadius(8),
+                    Margin    = new Microsoft.UI.Xaml.Thickness(0, 2, 0, 2),
+                };
+                var row = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
+                row.Children.Add(new FontIcon { Glyph = glyph, FontSize = 16 });
+                row.Children.Add(new TextBlock { Text = label, FontSize = 14, VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center });
+                btn.Content = row;
+
+                var capturedUrl     = url;
+                var capturedPicker  = (url == null);
+                btn.Click += (s, _) =>
+                {
+                    chosenUrl    = capturedUrl;
+                    usePickerApp = capturedPicker;
+                    dialog.Hide();
+                };
+                panel.Children.Add(btn);
+            }
+
+            dialog.Content = panel;
+            await dialog.ShowAsync();
+
+            if (usePickerApp)
+            {
+                // Force Windows "Open With" chooser — never opens a blank browser tab
+                var opts = new Windows.System.LauncherOptions { DisplayApplicationPicker = true };
+                var mailtoUri = new Uri($"mailto:{to}?subject={subject}&body={body}");
+                await Windows.System.Launcher.LaunchUriAsync(mailtoUri, opts);
+            }
+            else if (chosenUrl != null)
+            {
+                await Windows.System.Launcher.LaunchUriAsync(new Uri(chosenUrl));
+            }
         }
 
         // History filter by date period

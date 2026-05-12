@@ -158,6 +158,9 @@ namespace NarrazStudio
         public string ReportContentTitle => this["ReportContentTitle"];
         public string ReportContentDesc => this["ReportContentDesc"];
         public string ReportContentBtn => this["ReportContentBtn"];
+        public string ReportPickEmailTitle => this["ReportPickEmailTitle"];
+        public string ReportPickEmailDesc => this["ReportPickEmailDesc"];
+        public string ReportViaOther => this["ReportViaOther"];
 
         private Dictionary<string, string> _english = new()
         {
@@ -258,7 +261,10 @@ namespace NarrazStudio
             {"SaveAndExit", "Save & Exit Settings"},
             {"ReportContentTitle", "Report Inappropriate Content"},
             {"ReportContentDesc", "If you encounter AI-generated content that is harmful or inappropriate, please report it."},
-            {"ReportContentBtn", "Report"}
+            {"ReportContentBtn", "Report"},
+            {"ReportPickEmailTitle", "Choose Your Email App"},
+            {"ReportPickEmailDesc", "Select an email service to send your report to balveer09@outlook.com:"},
+            {"ReportViaOther", "Open with installed app..."}
         };
 
         private Dictionary<string, string> _hindi = new()
@@ -360,7 +366,10 @@ namespace NarrazStudio
             {"SaveAndExit", "सेटिंग्स सेव करें और बाहर जाएं"},
             {"ReportContentTitle", "अनुचित कंटेंट की रिपोर्ट करें"},
             {"ReportContentDesc", "अगर AI द्वारा बनाया गया कंटेंट हानिकारक या अनुचित लगे, तो कृपया इसकी रिपोर्ट करें।"},
-            {"ReportContentBtn", "रिपोर्ट करें"}
+            {"ReportContentBtn", "रिपोर्ट करें"},
+            {"ReportPickEmailTitle", "अपना ईमेल ऐप चुनें"},
+            {"ReportPickEmailDesc", "balveer09@outlook.com पर रिपोर्ट भेजने के लिए एक ईमेल सेवा चुनें:"},
+            {"ReportViaOther", "इंस्टॉल ऐप से खोलें..."}
         };
 
         private Dictionary<string, string> _chinese = new()
@@ -462,7 +471,10 @@ namespace NarrazStudio
             {"SaveAndExit", "保存并退出设置"},
             {"ReportContentTitle", "举报不当内容"},
             {"ReportContentDesc", "如果您遇到有害或不当的 AI 生成内容，请举报。"},
-            {"ReportContentBtn", "举报"}
+            {"ReportContentBtn", "举报"},
+            {"ReportPickEmailTitle", "选择您的电子邮件应用"},
+            {"ReportPickEmailDesc", "选择一个电子邮件服务将您的举报发送至 balveer09@outlook.com："},
+            {"ReportViaOther", "使用已安装的应用打开..."}
         };
 
         private Dictionary<string, string> _urdu = new()
@@ -564,7 +576,10 @@ namespace NarrazStudio
             {"SaveAndExit", "محفوظ کریں اور ترتیبات سے باہر نکلیں"},
             {"ReportContentTitle", "نامناسب مواد کی اطلاع دیں"},
             {"ReportContentDesc", "اگر AI سے بنایا گیا مواد نقصاندہ یا نامناسب لگے تو براہ کرم اطلاع دیں۔"},
-            {"ReportContentBtn", "اطلاع دیں"}
+            {"ReportContentBtn", "اطلاع دیں"},
+            {"ReportPickEmailTitle", "اپنی ای میل ایپ چنیں"},
+            {"ReportPickEmailDesc", "balveer09@outlook.com پر رپورٹ بھیجنے کے لیے ایک ای میل سروس منتخب کریں:"},
+            {"ReportViaOther", "نصب شدہ ایپ سے کھولیں..."}
         };
     }
 }

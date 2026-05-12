@@ -69,7 +69,7 @@
     <!-- Signing disabled: Microsoft Store signs the package on their servers -->
     <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <!-- Disable symbol/PDB packaging to avoid mspdbcmf.exe build error -->
+    <!-- Fully disable symbol/PDB packaging to prevent mspdbcmf.exe warning -->
     <GenerateTestArtifacts>False</GenerateTestArtifacts>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <AppxBundle>Always</AppxBundle>
@@ -79,7 +79,16 @@
     <GenerateTemporaryStoreCertificate>False</GenerateTemporaryStoreCertificate>
   </PropertyGroup>
 
-  <!-- Override the FastLink PDB task to prevent mspdbcmf.exe not found error -->
+  <!--
+    Suppress the mspdbcmf.exe warning: point directly to the known path so Exists() = true.
+    No symbols package is generated (AppxSymbolPackageEnabled=False) but the warning is silenced.
+  -->
+  <PropertyGroup>
+    <MsPdbCmfExeFullpath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\bin\Hostx64\x64\mspdbcmf.exe</MsPdbCmfExeFullpath>
+  </PropertyGroup>
   <Target Name="WinAppSdkCheckFastlinkPdb" />
+  <Target Name="_GenerateAppxSymbolPackage" />
+  <Target Name="_GenerateAppxUploadSymbolPackage" />
 
 </Project>
+
