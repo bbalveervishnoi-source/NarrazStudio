@@ -11,7 +11,7 @@
   <Identity
     Name="Balveer.Narraz"
     Publisher="CN=5DF516F6-AB4C-4B5A-98A5-230C2798E9CA"
-    Version="0.1.0.0" />
+    Version="0.1.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="510ce136-4b20-4923-9409-c06b84612093" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

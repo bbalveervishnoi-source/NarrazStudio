@@ -51,6 +51,23 @@ namespace NarrazStudio
         public int WordCount { get; set; }
         public int SrNo { get; set; }
         public LanguageManager Lang => LanguageManager.Instance;
+        public string FileSizeStr
+        {
+            get
+            {
+                try
+                {
+                    if (System.IO.File.Exists(FilePath))
+                    {
+                        long bytes = new System.IO.FileInfo(FilePath).Length;
+                        double mb = bytes / (1024.0 * 1024.0);
+                        return $"{mb:F2} MB";
+                    }
+                }
+                catch { }
+                return "—";
+            }
+        }
     }
 
     public class BatchExportItem : System.ComponentModel.INotifyPropertyChanged
@@ -60,7 +77,7 @@ namespace NarrazStudio
         public string FilePath { get; set; } = "";
         public string FileName { get; set; } = "";
         public long FileSizeBytes { get; set; }
-        public string FileSizeStr => $"{FileSizeBytes / 1024} KB";
+        public string FileSizeStr => FileSizeBytes > 0 ? $"{((double)FileSizeBytes / (1024.0 * 1024.0)):F2} MB" : "—";
         public string OutputFilePath { get; set; } = "";
         
         public System.Threading.CancellationTokenSource? ItemCts { get; set; }
@@ -126,6 +143,17 @@ namespace NarrazStudio
         }
     }
 
+    public class BatchCompletedItem
+    {
+        public string SrNo { get; set; } = "";
+        public string FileName { get; set; } = "";
+        public string OutputFilePath { get; set; } = "";
+        public string VoiceName { get; set; } = "";
+        public string DateString { get; set; } = "";
+        public string TimeString { get; set; } = "";
+        public string FileSizeStr { get; set; } = "";
+    }
+
     public sealed partial class MainWindow : Window
     {
         // Fields
@@ -149,13 +177,20 @@ namespace NarrazStudio
         private string _historyFilePath = "";
         private string _selectedPeriod = "All Records";
         private ObservableCollection<BatchExportItem> _batchItems = new();
+        private ObservableCollection<BatchCompletedItem> _completedItems = new();
         private string _batchSavePath = "";
         private bool _isBatchProcessing = false;
+        private bool _skipDeleteConfirm = false;
         private System.Threading.CancellationTokenSource? _batchCts;
 
         public MainWindow()
         {
             Console.WriteLine("MainWindow Constructor Started");
+            // INITIALIZE LANGUAGE FIRST so x:Bind resolves correctly
+            var initialSettings = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
+            string initialLang = (initialSettings["AppLanguage"] as string) ?? "System";
+            LanguageManager.Instance.SetLanguage(initialLang);
+
             try
             {
                 this.InitializeComponent();
@@ -169,6 +204,8 @@ namespace NarrazStudio
 
             this.Closed += MainWindow_Closed;
             _batchItems.CollectionChanged += (s, e) => UpdateBatchMasterButtons();
+            BatchFilesList.ItemsSource = _batchItems;
+            CompletedList.ItemsSource = _completedItems;
 
             // Set up Title Bar
             this.ExtendsContentIntoTitleBar = true;
@@ -182,11 +219,16 @@ namespace NarrazStudio
             if (this.Content is FrameworkElement fe) {
                 var settings = ApplicationData.Current.LocalSettings.Values;
                 string theme = (settings["AppTheme"] as string) ?? "System";
-                fe.RequestedTheme = theme switch {
-                    "Light" => ElementTheme.Light,
-                    "Dark" => ElementTheme.Dark,
-                    _ => ElementTheme.Default
-                };
+                if (theme == "Aqua") {
+                    fe.RequestedTheme = ElementTheme.Light;
+                    ApplyAquaTheme();
+                } else {
+                    fe.RequestedTheme = theme switch {
+                        "Light" => ElementTheme.Light,
+                        "Dark" => ElementTheme.Dark,
+                        _ => ElementTheme.Default
+                    };
+                }
             }
             UpdateCaptionButtonColors();
 
@@ -313,10 +355,30 @@ namespace NarrazStudio
                 </style>
                 </head>
                 <body class='{themeClass}'>
-                  <textarea id='editor' placeholder='Paste text to narrate...' spellcheck='false'></textarea>
+                  <textarea id='editor' placeholder='{LanguageManager.Instance["EditorPlaceholder"]}' spellcheck='false'></textarea>
                   <script>
                     const editor = document.getElementById('editor');
                     editor.addEventListener('input', function() {{ window.chrome.webview.postMessage('text_changed'); }});
+
+                    document.addEventListener('dragover', function(e) {{
+                        e.preventDefault();
+                    }});
+                    document.addEventListener('drop', function(e) {{
+                        e.preventDefault();
+                        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {{
+                            const file = e.dataTransfer.files[0];
+                            if (file.name.toLowerCase().endsWith('.txt')) {{
+                                const reader = new FileReader();
+                                reader.onload = function(evt) {{
+                                    editor.value = evt.target.result;
+                                    window.chrome.webview.postMessage('text_changed');
+                                }};
+                                reader.readAsText(file);
+                            }} else {{
+                                window.chrome.webview.postMessage('invalid_file');
+                            }}
+                        }}
+                    }});
                   </script>
                 </body>
                 </html>";
@@ -356,8 +418,8 @@ namespace NarrazStudio
                     FailureReason.Text = "Narraz Studio requires an active internet connection to sync voices and generate audio. Please check your connection and try again.";
                     FailurePrimaryBtn.Content = "OK";
                     _isInternetError = true;
-                    FailureSecondaryBtn.Visibility = Visibility.Collapsed;
                     ShowOverlayState("Failure");
+                    FailureSecondaryBtn.Visibility = Visibility.Collapsed;
                 });
             }
             return isAvailable;
@@ -372,9 +434,7 @@ namespace NarrazStudio
                     var items = JsonSerializer.Deserialize<List<HistoryItem>>(json);
                     if (items != null) {
                         _fullHistory = items.OrderByDescending(x => x.Timestamp).ToList();
-                        for (int i = 0; i < _fullHistory.Count; i++) _fullHistory[i].SrNo = _fullHistory.Count - i;
-                        _historyList.Clear();
-                        foreach (var item in _fullHistory) _historyList.Add(item);
+                        UpdateHistoryUI(_fullHistory);
                     }
                 }
             } catch { }
@@ -403,10 +463,7 @@ namespace NarrazStudio
                 WordCount = words
             };
             _fullHistory.Insert(0, item);
-            for (int i = 0; i < _fullHistory.Count; i++) _fullHistory[i].SrNo = _fullHistory.Count - i;
-            _historyList.Insert(0, item);
-            SaveHistory();
-            UpdateFilteringOptions();
+            ApplyAdvancedFilters();
         }
 
         private void UpdateFilteringOptions() { }
@@ -494,6 +551,13 @@ namespace NarrazStudio
             }
             int parallelLimit = (settings["ParallelChunkLimit"] as int?) ?? 15;
             ParallelLimitSelector.SelectedIndex = parallelLimit - 1;
+
+            // Restore Aqua theme overlay if it was active
+            if (theme == "Aqua")
+            {
+                if (this.Content is FrameworkElement fe) fe.RequestedTheme = ElementTheme.Light;
+                ApplyAquaTheme();
+            }
         }
 
         // Auto-apply theme selection
@@ -503,12 +567,23 @@ namespace NarrazStudio
             var settings = ApplicationData.Current.LocalSettings.Values;
             string theme = (ThemeSelector.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "System";
             settings["AppTheme"] = theme;
-            if (this.Content is FrameworkElement fe) {
-                fe.RequestedTheme = theme switch {
-                    "Light" => ElementTheme.Light,
-                    "Dark" => ElementTheme.Dark,
-                    _ => ElementTheme.Default
-                };
+
+            if (theme == "Aqua")
+            {
+                // Aqua forces light element theme, then overlays Aqua visuals
+                if (this.Content is FrameworkElement fe2) fe2.RequestedTheme = ElementTheme.Light;
+                ApplyAquaTheme();
+            }
+            else
+            {
+                RemoveAquaTheme();
+                if (this.Content is FrameworkElement fe) {
+                    fe.RequestedTheme = theme switch {
+                        "Light" => ElementTheme.Light,
+                        "Dark"  => ElementTheme.Dark,
+                        _       => ElementTheme.Default
+                    };
+                }
             }
             UpdateCaptionButtonColors();
             UpdateWebViewTheme();
@@ -548,12 +623,106 @@ namespace NarrazStudio
             } catch { }
         }
 
+        // Apply the Aqua theme overlay — standard mac OS style with custom color design
+        private void ApplyAquaTheme()
+        {
+            try
+            {
+                // 1. Classic Mac app background and default colours
+                Application.Current.Resources["SystemAccentColor"] = Windows.UI.Color.FromArgb(255, 10, 132, 255); // Classic Aqua Blue
+                Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 245, 245, 247));
+                Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
+                Application.Current.Resources["ControlFillColorDefaultBrush"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
+                
+                // Classic Mac Button styles
+                Application.Current.Resources["ButtonBackgroundPointerOver"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 230, 230, 230));
+                Application.Current.Resources["ButtonBackgroundPressed"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 210, 210, 210));
+                Application.Current.Resources["ButtonBorderBrush"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 200, 200, 200));
+                Application.Current.Resources["ButtonBorderBrushPointerOver"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 180, 180, 180));
+                
+                // Clear the root grid background if previously set
+                if (this.Content is Grid rootGrid)
+                {
+                    rootGrid.Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["ApplicationPageBackgroundThemeBrush"];
+                }
+
+                // Trigger a UI update by toggling the theme
+                if (this.Content is FrameworkElement root)
+                {
+                    root.RequestedTheme = ElementTheme.Dark;
+                    root.RequestedTheme = ElementTheme.Light;
+                }
+
+                // 2. Brushed-metal title bar colour
+                var titleBar = this.AppWindow.TitleBar;
+                titleBar.BackgroundColor         = Windows.UI.Color.FromArgb(255, 226, 226, 230);
+                titleBar.InactiveBackgroundColor = Windows.UI.Color.FromArgb(255, 245, 245, 247);
+                titleBar.ForegroundColor         = Windows.UI.Color.FromArgb(255, 28, 28, 30);
+                titleBar.InactiveForegroundColor = Windows.UI.Color.FromArgb(255, 142, 142, 147);
+                titleBar.ButtonBackgroundColor   = Windows.UI.Color.FromArgb(0, 0, 0, 0); // transparent
+                titleBar.ButtonForegroundColor   = Windows.UI.Color.FromArgb(255, 28, 28, 30);
+                titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(30, 0, 0, 0);
+
+                // 3. Disable Mica so the standard background shows
+                this.SystemBackdrop = null;
+            }
+            catch { }
+        }
+
+        private void RemoveAquaTheme()
+        {
+            try
+            {
+                // Restore standard resources
+                Application.Current.Resources.Remove("SystemAccentColor");
+                Application.Current.Resources.Remove("ApplicationPageBackgroundThemeBrush");
+                Application.Current.Resources.Remove("CardBackgroundFillColorDefaultBrush");
+                Application.Current.Resources.Remove("ControlFillColorDefaultBrush");
+                Application.Current.Resources.Remove("ButtonBackgroundPointerOver");
+                Application.Current.Resources.Remove("ButtonBackgroundPressed");
+                Application.Current.Resources.Remove("ButtonBorderBrush");
+                Application.Current.Resources.Remove("ButtonBorderBrushPointerOver");
+
+                // Trigger a UI update by toggling the theme
+                if (this.Content is FrameworkElement root)
+                {
+                    var settings = ApplicationData.Current.LocalSettings.Values;
+                    string theme = (settings["AppTheme"] as string) ?? "System";
+                    root.RequestedTheme = theme switch {
+                        "Light" => ElementTheme.Light,
+                        "Dark" => ElementTheme.Dark,
+                        _ => ElementTheme.Default
+                    };
+                }
+
+                // Restore normal page background
+                if (this.Content is Grid rootGrid)
+                    rootGrid.Background = null; // let WinUI ThemeResource take over
+
+                // Restore transparent title bar
+                var titleBar = this.AppWindow.TitleBar;
+                titleBar.BackgroundColor         = Microsoft.UI.Colors.Transparent;
+                titleBar.InactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+                titleBar.ButtonBackgroundColor   = Microsoft.UI.Colors.Transparent;
+
+                // Restore Mica if enabled in settings
+                var s = ApplicationData.Current.LocalSettings.Values;
+                bool micaOn = (s["MicaEnabled"] as bool?) ?? true;
+                this.SystemBackdrop = micaOn
+                    ? (Microsoft.UI.Xaml.Media.SystemBackdrop)new Microsoft.UI.Xaml.Media.MicaBackdrop()
+                    : new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+            }
+            catch { }
+        }
+
         // Auto-apply language selection
         private void LanguageSelector_Changed(object sender, SelectionChangedEventArgs e)
         {
             if (!_isLoaded) return;
             string lang = (LanguageSelector.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "System";
             LanguageManager.Instance.SetLanguage(lang);
+            CheckFFmpegStatus();
+            UpdateWebViewTheme(); // Also re-injects the HTML to update the placeholder text
         }
 
         // Auto-apply parallel limit selection
@@ -730,7 +899,12 @@ namespace NarrazStudio
         private void UpdateHistoryUI(List<HistoryItem> list)
         {
             _historyList.Clear();
-            foreach (var item in list) _historyList.Add(item);
+            int index = 1;
+            foreach (var item in list)
+            {
+                item.SrNo = index++;
+                _historyList.Add(item);
+            }
         }
 
         private void OpenHistoryFile_Click(object sender, RoutedEventArgs e)
@@ -756,11 +930,41 @@ namespace NarrazStudio
             }
         }
 
-        private void DeleteHistoryItem_Click(object sender, RoutedEventArgs e)
+        private async void DeleteHistoryItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is HistoryItem item) {
+                if (!_skipDeleteConfirm)
+                {
+                    var chk = new CheckBox { Content = Lang.DeleteDontAsk, IsChecked = false };
+                    var panel = new StackPanel { Spacing = 10 };
+                    panel.Children.Add(new TextBlock { Text = string.Format(Lang.DeleteHistoryMsg, item.FileName), TextWrapping = TextWrapping.Wrap });
+                    panel.Children.Add(chk);
+
+                    var dialog = new ContentDialog
+                    {
+                        Title = Lang.DeleteHistoryTitle,
+                        Content = panel,
+                        PrimaryButtonText = Lang.BatchDelete,
+                        CloseButtonText = Lang.Cancel,
+                        XamlRoot = this.Content.XamlRoot
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result != ContentDialogResult.Primary) return;
+                    if (chk.IsChecked == true) _skipDeleteConfirm = true;
+                }
+
+                try
+                {
+                    if (File.Exists(item.FilePath))
+                    {
+                        File.Delete(item.FilePath);
+                    }
+                }
+                catch { }
+
                 _fullHistory.Remove(item);
-                _historyList.Remove(item);
+                ApplyAdvancedFilters();
                 SaveHistory();
             }
         }
@@ -768,7 +972,7 @@ namespace NarrazStudio
         // Fetch voices from Python engine and populate list
         private async void SyncVoices()
         {
-            if (!CheckInternetConnection()) {
+            if (!CheckInternetConnection(true)) {
                 SelectedVoiceName.Text = "Sync Failed (No Internet)";
                 return;
             }
@@ -794,7 +998,7 @@ namespace NarrazStudio
                 await process.WaitForExitAsync();
 
                 var voices = JsonSerializer.Deserialize<List<VoiceModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (voices != null)
+                if (voices != null && voices.Count > 0)
                 {
                     _allVoices = voices;
                     UpdateListView(_allVoices);
@@ -814,8 +1018,20 @@ namespace NarrazStudio
                         SelectedVoiceName.Text = "Select a Narrator";
                     }
                 }
+                else
+                {
+                    throw new Exception("No voices returned.");
+                }
             } catch {
                 SelectedVoiceName.Text = "Sync Failed!";
+                DispatcherQueue.TryEnqueue(() => {
+                    FailureTitle.Text = "No Internet Connection";
+                    FailureReason.Text = "Narraz Studio requires an active internet connection to sync voices and generate audio. Please check your connection and try again.";
+                    FailurePrimaryBtn.Content = "OK";
+                    _isInternetError = true;
+                    ShowOverlayState("Failure");
+                    FailureSecondaryBtn.Visibility = Visibility.Collapsed;
+                });
             }
         }
 
@@ -895,20 +1111,70 @@ namespace NarrazStudio
             {
                 foreach (var file in files)
                 {
-                    if (!_batchItems.Any(x => x.FilePath == file.Path))
+                    await AddFileToBatchAsync(file);
+                }
+            }
+        }
+
+        private async Task AddFileToBatchAsync(Windows.Storage.StorageFile file)
+        {
+            if (!_batchItems.Any(x => x.FilePath == file.Path))
+            {
+                var props = await file.GetBasicPropertiesAsync();
+                var newItem = new BatchExportItem 
+                { 
+                    FileName = file.Name, 
+                    FilePath = file.Path, 
+                    FileSizeBytes = (long)props.Size,
+                    Progress = 0,
+                    IsProcessing = false
+                };
+                newItem.StateChanged = UpdateBatchMasterButtons;
+                _batchItems.Add(newItem);
+            }
+        }
+
+        private void BatchFilesList_DragItemsStarting(object sender, Microsoft.UI.Xaml.Controls.DragItemsStartingEventArgs e)
+        {
+            if (_isBatchProcessing)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void BatchFilesList_DragOver(object sender, Microsoft.UI.Xaml.DragEventArgs e)
+        {
+            if (e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+            {
+                e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+            }
+        }
+
+        private async void BatchFilesList_Drop(object sender, Microsoft.UI.Xaml.DragEventArgs e)
+        {
+            if (e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                bool invalidFound = false;
+
+                foreach (var item in items)
+                {
+                    if (item is Windows.Storage.StorageFile file)
                     {
-                        var props = await file.GetBasicPropertiesAsync();
-                        var newItem = new BatchExportItem 
-                        { 
-                            FileName = file.Name, 
-                            FilePath = file.Path, 
-                            FileSizeBytes = (long)props.Size,
-                            Progress = 0,
-                            IsProcessing = false
-                        };
-                        newItem.StateChanged = UpdateBatchMasterButtons;
-                        _batchItems.Add(newItem);
+                        if (file.FileType.ToLower() == ".txt")
+                        {
+                            await AddFileToBatchAsync(file);
+                        }
+                        else
+                        {
+                            invalidFound = true;
+                        }
                     }
+                }
+
+                if (invalidFound)
+                {
+                    ShowInvalidFilePopup();
                 }
             }
         }
@@ -916,6 +1182,12 @@ namespace NarrazStudio
         private void UpdateBatchMasterButtons()
         {
             DispatcherQueue.TryEnqueue(() => {
+                if (BatchEmptyStatePanel != null && BatchFilesList != null)
+                {
+                    BatchEmptyStatePanel.Visibility = _batchItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+                    BatchFilesList.Visibility = _batchItems.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+                }
+
                 if (_batchItems.Count > 0 && _batchItems.All(i => i.IsCompleted))
                 {
                     if (BatchExportAllBtn != null) BatchExportAllBtn.Visibility = Visibility.Collapsed;
@@ -947,7 +1219,8 @@ namespace NarrazStudio
                 Process.Start("explorer.exe", $"\"{_batchSavePath}\"");
             }
         }
-        private async void BatchSelectSavePath_Click(object sender, RoutedEventArgs e)
+
+        private async Task TriggerBatchSavePathAsync()
         {
             var picker = new FolderPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
@@ -962,6 +1235,11 @@ namespace NarrazStudio
                 _batchSavePath = folder.Path;
                 BatchSavePathText.Text = folder.Path;
             }
+        }
+
+        private async void BatchSelectSavePath_Click(object sender, RoutedEventArgs e)
+        {
+            await TriggerBatchSavePathAsync();
         }
 
         private void BatchDeleteItem_Click(object sender, RoutedEventArgs e)
@@ -991,43 +1269,106 @@ namespace NarrazStudio
                 string rate = $"{(rateVal >= 0 ? "+" : "")}{rateVal}%";
                 string pitch = $"{(pitchVal >= 0 ? "+" : "")}{pitchVal}Hz";
 
-                item.IsProcessing = true;
-                item.IsQueued = false;
-                item.IsCompleted = false;
-                item.Progress = 0;
-                item.StatusText = "Preparing...";
-                item.ItemCts = new System.Threading.CancellationTokenSource();
-
-                bool ok = await ProcessBatchItemExport(item, _selectedVoice.ShortName, rate, pitch);
-                
-                item.IsProcessing = false;
-                if (ok && !item.ItemCts.IsCancellationRequested)
+                if (_isBatchProcessing)
                 {
-                    item.IsCompleted = true;
-                    item.StatusText = "Completed";
-                }
-                else if (item.ItemCts.IsCancellationRequested)
-                {
-                    item.StatusText = "Cancelled";
+                    item.IsQueued = true;
+                    item.IsCompleted = false;
+                    item.StatusText = "Queued...";
                 }
                 else
                 {
-                    item.StatusText = "Failed";
+                    item.IsProcessing = true;
+                    item.IsQueued = false;
+                    item.IsCompleted = false;
+                    item.Progress = 0;
+                    item.StatusText = "Preparing...";
+                    item.ItemCts = new System.Threading.CancellationTokenSource();
+
+                    bool ok = await ProcessBatchItemExport(item, _selectedVoice.ShortName, rate, pitch);
+                    
+                    item.IsProcessing = false;
+                    if (ok && !item.ItemCts.IsCancellationRequested)
+                    {
+                        item.IsCompleted = true;
+                        item.StatusText = "Completed";
+                        try {
+                            string fullText = await File.ReadAllTextAsync(item.FilePath);
+                            int chars = fullText.Length;
+                            int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                            string safePath = "";
+                            try { safePath = item.OutputFilePath; } catch { }
+                            AddToHistory(Path.GetFileName(item.OutputFilePath), safePath, chars, words);
+                        } catch { }
+                        DispatcherQueue.TryEnqueue(() => {
+                            AddToCompletedTab(item);
+                            _batchItems.Remove(item);
+                        });
+                    }
+                    else if (item.ItemCts.IsCancellationRequested)
+                    {
+                        item.StatusText = "Cancelled";
+                    }
+                    else
+                    {
+                        item.StatusText = "Failed";
+                    }
                 }
             }
         }
 
         private async void BatchExportAll_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(_batchSavePath))
+            bool isFolderMissing = string.IsNullOrEmpty(_batchSavePath);
+            bool isFilesMissing = _batchItems.Count == 0;
+
+            if (isFolderMissing && isFilesMissing)
             {
-                BatchSavePathText.Text = "Please select a save path first!";
-                BatchSavePathText.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                ContentDialog dialog = new ContentDialog
+                {
+                    Title = Lang.WarningTitle,
+                    Content = Lang.WarningNoFilesOrFolder,
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await dialog.ShowAsync();
                 return;
             }
-            BatchSavePathText.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
+            else if (isFolderMissing)
+            {
+                ContentDialog dialog = new ContentDialog
+                {
+                    Title = Lang.WarningTitle,
+                    Content = Lang.WarningNoFolder,
+                    PrimaryButtonText = Lang.SelectFolderBtn,
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    await TriggerBatchSavePathAsync();
+                }
+                return;
+            }
+            else if (isFilesMissing)
+            {
+                ContentDialog dialog = new ContentDialog
+                {
+                    Title = Lang.WarningTitle,
+                    Content = Lang.WarningNoFiles,
+                    PrimaryButtonText = Lang.AddFilesBtn,
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    BatchOpenFiles_Click(this, new RoutedEventArgs());
+                }
+                return;
+            }
 
-            if (_selectedVoice == null || _batchItems.Count == 0) return;
+            if (_selectedVoice == null) return;
 
             _isBatchProcessing = true;
             _batchCts = new System.Threading.CancellationTokenSource();
@@ -1048,33 +1389,45 @@ namespace NarrazStudio
                 }
             }
 
-            foreach (var item in _batchItems.ToList())
+            while (true)
             {
                 if (_batchCts.IsCancellationRequested) break;
-                if (item.IsQueued && !item.IsProcessing && !item.IsCompleted)
+                var item = _batchItems.FirstOrDefault(x => x.IsQueued && !x.IsProcessing && !x.IsCompleted);
+                if (item == null) break;
+
+                item.IsProcessing = true;
+                item.IsQueued = false;
+                item.Progress = 0;
+                item.StatusText = "Preparing...";
+                item.ItemCts = new System.Threading.CancellationTokenSource();
+                
+                bool ok = await ProcessBatchItemExport(item, _selectedVoice.ShortName, rate, pitch);
+                
+                item.IsProcessing = false;
+                if (ok && !item.ItemCts.IsCancellationRequested)
                 {
-                    item.IsProcessing = true;
-                    item.IsQueued = false;
-                    item.Progress = 0;
-                    item.StatusText = "Preparing...";
-                    item.ItemCts = new System.Threading.CancellationTokenSource();
-                    
-                    bool ok = await ProcessBatchItemExport(item, _selectedVoice.ShortName, rate, pitch);
-                    
-                    item.IsProcessing = false;
-                    if (ok && !item.ItemCts.IsCancellationRequested)
-                    {
-                        item.IsCompleted = true;
-                        item.StatusText = "Completed";
-                    }
-                    else if (item.ItemCts.IsCancellationRequested)
-                    {
-                        item.StatusText = "Cancelled";
-                    }
-                    else
-                    {
-                        item.StatusText = "Failed";
-                    }
+                    item.IsCompleted = true;
+                    item.StatusText = "Completed";
+                    try {
+                        string fullText = await File.ReadAllTextAsync(item.FilePath);
+                        int chars = fullText.Length;
+                        int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                        string safePath = "";
+                        try { safePath = item.OutputFilePath; } catch { }
+                        AddToHistory(Path.GetFileName(item.OutputFilePath), safePath, chars, words);
+                    } catch { }
+                    DispatcherQueue.TryEnqueue(() => {
+                        AddToCompletedTab(item);
+                        _batchItems.Remove(item);
+                    });
+                }
+                else if (item.ItemCts.IsCancellationRequested)
+                {
+                    item.StatusText = "Cancelled";
+                }
+                else
+                {
+                    item.StatusText = "Failed";
                 }
             }
 
@@ -1125,6 +1478,151 @@ namespace NarrazStudio
                 {
                     Process.Start("explorer.exe", $"/select,\"{item.OutputFilePath}\"");
                 }
+            }
+        }
+
+        private void AddToCompletedTab(BatchExportItem item)
+        {
+            long size = 0;
+            try { if (File.Exists(item.OutputFilePath)) size = new FileInfo(item.OutputFilePath).Length; } catch { }
+            var completed = new BatchCompletedItem
+            {
+                SrNo = (_completedItems.Count + 1).ToString(),
+                FileName = item.FileName,
+                OutputFilePath = item.OutputFilePath,
+                VoiceName = _selectedVoice?.Name ?? "",
+                DateString = DateTime.Now.ToString("dd MMM yyyy"),
+                TimeString = DateTime.Now.ToString("hh:mm tt"),
+                FileSizeStr = size > 0 ? $"{size / 1024} KB" : "—"
+            };
+            _completedItems.Add(completed);
+        }
+
+        private void BatchTabConverting_Click(object sender, RoutedEventArgs e)
+        {
+            BatchConvertingPanel.Visibility = Visibility.Visible;
+            BatchFinishedPanel.Visibility = Visibility.Collapsed;
+            BatchTabConvertingIndicator.Opacity = 1;
+            BatchTabFinishedIndicator.Opacity = 0;
+            BatchTabConvertingText.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+            BatchTabFinishedText.FontWeight = Microsoft.UI.Text.FontWeights.Normal;
+        }
+
+        private void BatchTabFinished_Click(object sender, RoutedEventArgs e)
+        {
+            BatchConvertingPanel.Visibility = Visibility.Collapsed;
+            BatchFinishedPanel.Visibility = Visibility.Visible;
+            BatchTabConvertingIndicator.Opacity = 0;
+            BatchTabFinishedIndicator.Opacity = 1;
+            BatchTabConvertingText.FontWeight = Microsoft.UI.Text.FontWeights.Normal;
+            BatchTabFinishedText.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+        }
+
+        private async void CompletedOpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BatchCompletedItem item)
+            {
+                if (string.IsNullOrEmpty(item.OutputFilePath) || !File.Exists(item.OutputFilePath)) return;
+
+                // Build list of apps that can open audio files
+                var apps = new List<(string Name, string Executable, string Args)>
+                {
+                    ("Windows Media Player", "wmplayer.exe", $"\"{item.OutputFilePath}\""),
+                    ("Groove Music", "shell:AppsFolder\\Microsoft.ZuneMusic_8wekyb3d8bbwe!Microsoft.ZuneMusic", $"\"{item.OutputFilePath}\""),
+                    ("VLC Media Player", "vlc", $"\"{item.OutputFilePath}\""),
+                    ("Winamp", "winamp.exe", $"\"{item.OutputFilePath}\""),
+                    ("foobar2000", "foobar2000.exe", $"\"{item.OutputFilePath}\""),
+                    ("Open with default app", "", "")
+                };
+
+                // Build dialog with radio buttons
+                var panel = new StackPanel { Spacing = 8 };
+                var radioButtons = new List<RadioButton>();
+                foreach (var app in apps)
+                {
+                    var rb = new RadioButton { Content = app.Name, Tag = app };
+                    if (radioButtons.Count == 0) rb.IsChecked = true;
+                    radioButtons.Add(rb);
+                    panel.Children.Add(rb);
+                }
+
+                var dialog = new ContentDialog
+                {
+                    Title = "Open With",
+                    Content = new ScrollViewer { Content = panel, MaxHeight = 300 },
+                    PrimaryButtonText = "Open",
+                    CloseButtonText = "Cancel",
+                    XamlRoot = this.Content.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    var selected = radioButtons.FirstOrDefault(r => r.IsChecked == true);
+                    if (selected?.Tag is (string name, string exe, string args))
+                    {
+                        try
+                        {
+                            if (string.IsNullOrEmpty(exe))
+                            {
+                                // Default app
+                                await Windows.System.Launcher.LaunchFileAsync(await Windows.Storage.StorageFile.GetFileFromPathAsync(item.OutputFilePath));
+                            }
+                            else if (exe.StartsWith("shell:"))
+                            {
+                                Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = exe + " " + args, UseShellExecute = true });
+                            }
+                            else
+                            {
+                                Process.Start(new ProcessStartInfo { FileName = exe, Arguments = args, UseShellExecute = true });
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+        }
+
+        private void CompletedLocate_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BatchCompletedItem item)
+            {
+                if (!string.IsNullOrEmpty(item.OutputFilePath))
+                    Process.Start("explorer.exe", $"/select,\"{item.OutputFilePath}\"");
+            }
+        }
+
+        private async void CompletedDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BatchCompletedItem item)
+            {
+                if (!_skipDeleteConfirm)
+                {
+                    var chk = new CheckBox { Content = Lang.DeleteDontAsk, IsChecked = false };
+                    var panel = new StackPanel { Spacing = 10 };
+                    panel.Children.Add(new TextBlock { Text = string.Format(Lang.DeleteHistoryMsg, item.FileName), TextWrapping = TextWrapping.Wrap });
+                    panel.Children.Add(chk);
+
+                    var dialog = new ContentDialog
+                    {
+                        Title = Lang.DeleteHistoryTitle,
+                        Content = panel,
+                        PrimaryButtonText = Lang.BatchDelete,
+                        CloseButtonText = Lang.Cancel,
+                        XamlRoot = this.Content.XamlRoot
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result != ContentDialogResult.Primary) return;
+                    if (chk.IsChecked == true) _skipDeleteConfirm = true;
+                }
+
+                try { if (File.Exists(item.OutputFilePath)) File.Delete(item.OutputFilePath); } catch { }
+                _completedItems.Remove(item);
+
+                // Re-number remaining items
+                for (int i = 0; i < _completedItems.Count; i++)
+                    _completedItems[i].SrNo = (i + 1).ToString();
             }
         }
 
@@ -1194,7 +1692,7 @@ namespace NarrazStudio
                                 {
                                     DispatcherQueue.TryEnqueue(() => {
                                         if (t > 0) item.Progress = (double)c / t * 100;
-                                        item.StatusText = $"Completed chunk {c}/{t}";
+                                        item.StatusText = string.Format(LanguageManager.Instance["CompletedChunk"], c, t);
                                     });
                                 }
                             }
@@ -1353,13 +1851,16 @@ namespace NarrazStudio
                             }
                         }
                         
+                        string safePath = "";
+                        try { safePath = file.Path; } catch { }
+                        
                         SuccessFileName.Text = file.Name;
-                        SuccessFilePath.Text = file.Path;
+                        SuccessFilePath.Text = safePath;
                         
                         try {
                             int chars = fullText.Length;
                             int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
-                            AddToHistory(file.Name, file.Path, chars, words);
+                            AddToHistory(file.Name, safePath, chars, words);
                         } catch { }
 
                         ShowOverlayState("Success");
@@ -1443,7 +1944,15 @@ namespace NarrazStudio
                                 string statusMsg = e.Data.Substring(7).Trim();
                                 DispatcherQueue.TryEnqueue(() => {
                                     if (statusMsg.StartsWith("Completed chunk")) {
-                                        StatusChunkLabel.Text = statusMsg;
+                                        // Parse c and t
+                                        var parts = statusMsg.Split('/');
+                                        if (parts.Length == 2) {
+                                            string cStr = parts[0].Replace("Completed chunk", "").Trim();
+                                            string tStr = parts[1].Trim();
+                                            StatusChunkLabel.Text = string.Format(LanguageManager.Instance["CompletedChunk"], cStr, tStr);
+                                        } else {
+                                            StatusChunkLabel.Text = statusMsg;
+                                        }
                                     } else {
                                         StatusDetailLabel.Text = statusMsg;
                                     }
@@ -1653,8 +2162,22 @@ namespace NarrazStudio
                 if (message == "text_changed") {
                     _wordCountTimer?.Stop();
                     _wordCountTimer?.Start();
+                } else if (message == "invalid_file") {
+                    ShowInvalidFilePopup();
                 }
             } catch { }
+        }
+
+        private async void ShowInvalidFilePopup()
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Invalid File",
+                Content = "Only text (.txt) files are supported.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+            await dialog.ShowAsync();
         }
 
         // Count words and characters on a background thread

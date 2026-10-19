@@ -166,6 +166,35 @@ namespace NarrazStudio
         public string FeedbackBtn => this["FeedbackBtn"];
         public string FeedbackPickEmailTitle => this["FeedbackPickEmailTitle"];
         public string FeedbackPickEmailDesc => this["FeedbackPickEmailDesc"];
+        public string Aqua => this["Aqua"];
+        public string Converting => this["Converting"];
+        public string Finished => this["Finished"];
+        public string BatchOpen => this["BatchOpen"];
+        public string BatchLocate => this["BatchLocate"];
+        public string BatchDelete => this["BatchDelete"];
+        public string DeleteConfirmTitle => this["DeleteConfirmTitle"];
+        public string DeleteConfirmMsg => this["DeleteConfirmMsg"];
+        public string DeleteDontAsk => this["DeleteDontAsk"];
+        public string OpenWith => this["OpenWith"];
+        public string ThemeAqua => this["ThemeAqua"];
+        public string SrNo => this["SrNo"];
+        public string FileNameCol => this["FileNameCol"];
+        public string NarratorCol => this["NarratorCol"];
+        public string DateCol => this["DateCol"];
+        public string SizeCol => this["SizeCol"];
+        public string ActionsCol => this["ActionsCol"];
+        public string EditorPlaceholder => this["EditorPlaceholder"];
+        public string CompletedChunk => this["CompletedChunk"];
+        public string AddFileBtn => this["AddFileBtn"];
+        public string DragDropFileHere => this["DragDropFileHere"];
+        public string WarningTitle => this["WarningTitle"];
+        public string WarningNoFilesOrFolder => this["WarningNoFilesOrFolder"];
+        public string WarningNoFiles => this["WarningNoFiles"];
+        public string WarningNoFolder => this["WarningNoFolder"];
+        public string SelectFolderBtn => this["SelectFolderBtn"];
+        public string AddFilesBtn => this["AddFilesBtn"];
+        public string DeleteHistoryTitle => this["DeleteHistoryTitle"];
+        public string DeleteHistoryMsg => this["DeleteHistoryMsg"];
 
         private Dictionary<string, string> _english = new()
         {
@@ -278,7 +307,36 @@ namespace NarrazStudio
             {"FeedbackPickEmailTitle", "Choose Your Email App"},
             {"FeedbackPickEmailDesc", "Select an email service to send your feedback to balveer09@outlook.com:"},
             {"FeedbackEmailSubject", "Narraz Studio: Feedback"},
-            {"FeedbackEmailBody", "Hello,\n\nHere is my feedback for Narraz Studio:\n\n[Please share your thoughts, suggestions, or ideas here]\n\nApp Version: Narraz Studio Beta\nThank you."}
+            {"FeedbackEmailBody", "Hello,\n\nHere is my feedback for Narraz Studio:\n\n[Please share your thoughts, suggestions, or ideas here]\n\nApp Version: Narraz Studio Beta\nThank you."},
+            {"Aqua", "Aqua"},
+            {"Converting", "Converting"},
+            {"Finished", "Finished"},
+            {"BatchOpen", "Open"},
+            {"BatchLocate", "Locate"},
+            {"BatchDelete", "Delete"},
+            {"DeleteConfirmTitle", "Delete File"},
+            {"DeleteConfirmMsg", "Are you sure you want to delete this file? This will permanently remove it from disk."},
+            {"DeleteDontAsk", "Don't ask me again"},
+            {"OpenWith", "Open With"},
+            {"ThemeAqua", "Aqua (macOS)"},
+            {"SrNo", "#"},
+            {"FileNameCol", "File Name"},
+            {"NarratorCol", "Narrator"},
+            {"DateCol", "Date"},
+            {"SizeCol", "Size"},
+            {"ActionsCol", "Actions"},
+            {"EditorPlaceholder", "Type, paste, or drag and drop .txt files here..."},
+            {"CompletedChunk", "Completed chunk {0}/{1}"},
+            {"AddFileBtn", "ADD FILE"},
+            {"DragDropFileHere", "Drag and drop file here"},
+            {"WarningTitle", "Warning"},
+            {"WarningNoFilesOrFolder", "Please select a save folder and add at least one text file first!"},
+            {"WarningNoFiles", "Please add at least one text file first!"},
+            {"WarningNoFolder", "Please select a save folder first!"},
+            {"SelectFolderBtn", "Select Folder"},
+            {"AddFilesBtn", "Add Files"},
+            {"DeleteHistoryTitle", "Delete Narration"},
+            {"DeleteHistoryMsg", "Are you sure you want to delete '{0}'? This will permanently remove the audio file from your disk."}
         };
 
         private Dictionary<string, string> _hindi = new()
@@ -392,7 +450,36 @@ namespace NarrazStudio
             {"FeedbackPickEmailTitle", "अपना ईमेल ऐप चुनें"},
             {"FeedbackPickEmailDesc", "balveer09@outlook.com पर फ़ीडबैक भेजने के लिए एक ईमेल सेवा चुनें:"},
             {"FeedbackEmailSubject", "Narraz Studio: फ़ीडबैक"},
-            {"FeedbackEmailBody", "नमस्ते,\n\nNarraz Studio के लिए मेरा फ़ीडबैक:\n\n[यहाँ अपने विचार, सुझाव या विचार साझा करें]\n\nऐप संस्करण: Narraz Studio Beta\nधन्यवाद।"}
+            {"FeedbackEmailBody", "नमस्ते,\n\nNarraz Studio के लिए मेरा फ़ीडबैक:\n\n[यहाँ अपने विचार, सुझाव या विचार साझा करें]\n\nऐप संस्करण: Narraz Studio Beta\nधन्यवाद।"},
+            {"Aqua", "Aqua"},
+            {"Converting", "कन्वर्ट हो रहा है"},
+            {"Finished", "पूर्ण हुए"},
+            {"BatchOpen", "खोलें"},
+            {"BatchLocate", "खोजें"},
+            {"BatchDelete", "हटाएं"},
+            {"DeleteConfirmTitle", "फ़ाइल हटाएं"},
+            {"DeleteConfirmMsg", "क्या आप वाकई इस फ़ाइल को हटाना चाहते हैं? यह डिस्क से स्थायी रूप से हटा दी जाएगी।"},
+            {"DeleteDontAsk", "दोबारा मत पूछें"},
+            {"OpenWith", "के साथ खोलें"},
+            {"ThemeAqua", "Aqua (macOS)"},
+            {"SrNo", "#"},
+            {"FileNameCol", "फ़ाइल नाम"},
+            {"NarratorCol", "नैरेटर"},
+            {"DateCol", "तारीख"},
+            {"SizeCol", "साइज़"},
+            {"ActionsCol", "विकल्प"},
+            {"EditorPlaceholder", "टाइप करें, पेस्ट करें, या .txt फ़ाइलें यहाँ खींचकर छोड़ें..."},
+            {"CompletedChunk", "चंक पूरा हुआ {0}/{1}"},
+            {"AddFileBtn", "फ़ाइल जोड़ें"},
+            {"DragDropFileHere", "यहाँ फ़ाइल खींचें और छोड़ें"},
+            {"WarningTitle", "चेतावनी"},
+            {"WarningNoFilesOrFolder", "कृपया पहले एक फ़ोल्डर चुनें और कम से कम एक टेक्स्ट फ़ाइल जोड़ें!"},
+            {"WarningNoFiles", "कृपया पहले कम से कम एक टेक्स्ट फ़ाइल जोड़ें!"},
+            {"WarningNoFolder", "कृपया पहले सहेजने का फ़ोल्डर चुनें!"},
+            {"SelectFolderBtn", "फ़ोल्डर चुनें"},
+            {"AddFilesBtn", "फ़ाइलें जोड़ें"},
+            {"DeleteHistoryTitle", "कथन हटाएं"},
+            {"DeleteHistoryMsg", "क्या आप वाकई '{0}' को हटाना चाहते हैं? यह ऑडियो फ़ाइल को आपके डिस्क से स्थायी रूप से हटा देगा।"}
         };
 
         private Dictionary<string, string> _chinese = new()
@@ -506,7 +593,36 @@ namespace NarrazStudio
             {"FeedbackPickEmailTitle", "选择您的电子邮件应用"},
             {"FeedbackPickEmailDesc", "选择一个电子邮件服务将您的反馈发送至 balveer09@outlook.com："},
             {"FeedbackEmailSubject", "Narraz Studio：用户反馈"},
-            {"FeedbackEmailBody", "您好，\n\n以下是我对 Narraz Studio 的反馈：\n\n[请在此分享您的想法、建议或意见]\n\n应用版本：Narraz Studio Beta\n谢谢。"}
+            {"FeedbackEmailBody", "您好，\n\n以下是我对 Narraz Studio 的反馈：\n\n[请在此分享您的想法、建议或意见]\n\n应用版本：Narraz Studio Beta\n谢谢。"},
+            {"Aqua", "Aqua"},
+            {"Converting", "转换中"},
+            {"Finished", "已完成"},
+            {"BatchOpen", "打开"},
+            {"BatchLocate", "定位"},
+            {"BatchDelete", "删除"},
+            {"DeleteConfirmTitle", "删除文件"},
+            {"DeleteConfirmMsg", "确定要删除此文件吗？此操作将永久从磁盘中删除该文件。"},
+            {"DeleteDontAsk", "不再询问"},
+            {"OpenWith", "打开方式"},
+            {"ThemeAqua", "Aqua (macOS)"},
+            {"SrNo", "#"},
+            {"FileNameCol", "文件名"},
+            {"NarratorCol", "讲述人"},
+            {"DateCol", "日期"},
+            {"SizeCol", "大小"},
+            {"ActionsCol", "操作"},
+            {"EditorPlaceholder", "在此处输入、粘贴或拖放 .txt 文件..."},
+            {"CompletedChunk", "已完成块 {0}/{1}"},
+            {"AddFileBtn", "添加文件"},
+            {"DragDropFileHere", "拖放文件至此"},
+            {"WarningTitle", "警告"},
+            {"WarningNoFilesOrFolder", "请先选择保存文件夹并至少添加一个文本文件！"},
+            {"WarningNoFiles", "请先至少添加一个文本文件！"},
+            {"WarningNoFolder", "请先选择保存文件夹！"},
+            {"SelectFolderBtn", "选择文件夹"},
+            {"AddFilesBtn", "添加文件"},
+            {"DeleteHistoryTitle", "删除朗读"},
+            {"DeleteHistoryMsg", "您确定要删除 '{0}' 吗？这将会从磁盘中永久删除该音频文件。"}
         };
 
         private Dictionary<string, string> _urdu = new()
@@ -620,9 +736,36 @@ namespace NarrazStudio
             {"FeedbackPickEmailTitle", "اپنی ای میل ایپ چنیں"},
             {"FeedbackPickEmailDesc", "balveer09@outlook.com پر فیڈ بیک بھیجنے کے لیے ایک ای میل سروس منتخب کریں:"},
             {"FeedbackEmailSubject", "Narraz Studio: فیڈ بیک"},
-            {"FeedbackEmailBody", "السلام علیکم،\n\nNarraz Studio کے بارے میں میرا فیڈ بیک:\n\n[براہ کرم یہاں اپنے خیالات، مشورے یا رائے شیئر کریں]\n\nایپ ورژن: Narraz Studio Beta\nشکریہ۔"}
+            {"FeedbackEmailBody", "السلام علیکم،\n\nNarraz Studio کے بارے میں میرا فیڈ بیک:\n\n[براہ کرم یہاں اپنے خیالات، مشورے یا رائے شیئر کریں]\n\nایپ ورژن: Narraz Studio Beta\nشکریہ۔"},
+            {"Aqua", "Aqua"},
+            {"Converting", "تبدیل ہو رہا ہے"},
+            {"Finished", "مکمل"},
+            {"BatchOpen", "کھولیں"},
+            {"BatchLocate", "تلاش کریں"},
+            {"BatchDelete", "حذف کریں"},
+            {"DeleteConfirmTitle", "فائل حذف کریں"},
+            {"DeleteConfirmMsg", "کیا آپ واقعی اس فائل کو حذف کرنا چاہتے ہیں؟ یہ ڈسک سے مستقل طور پر ہٹا دی جائے گی۔"},
+            {"DeleteDontAsk", "دوبارہ مت پوچھیں"},
+            {"OpenWith", "اس کے ساتھ کھولیں"},
+            {"ThemeAqua", "Aqua (macOS)"},
+            {"SrNo", "#"},
+            {"FileNameCol", "فائل کا نام"},
+            {"NarratorCol", "راوی"},
+            {"DateCol", "تاریخ"},
+            {"SizeCol", "سائز"},
+            {"ActionsCol", "اقدامات"},
+            {"EditorPlaceholder", "یہاں ٹائپ کریں، پیسٹ کریں، یا .txt فائلیں کھینچ کر چھوڑیں..."},
+            {"CompletedChunk", "مکمل شدہ حصہ {0}/{1}"},
+            {"AddFileBtn", "فائل شامل کریں"},
+            {"DragDropFileHere", "فائل یہاں ڈریگ اور ڈراپ کریں"},
+            {"WarningTitle", "انتباہ"},
+            {"WarningNoFilesOrFolder", "براہ کرم پہلے ایک فولڈر منتخب کریں اور کم از کم ایک ٹیکسٹ فائل شامل کریں!"},
+            {"WarningNoFiles", "براہ کرم پہلے کم از کم ایک ٹیکسٹ فائل شامل کریں!"},
+            {"WarningNoFolder", "براہ کرم پہلے محفوظ کرنے کا فولڈر منتخب کریں!"},
+            {"SelectFolderBtn", "فولڈر منتخب کریں"},
+            {"AddFilesBtn", "فائلیں شامل کریں"},
+            {"DeleteHistoryTitle", "بیان حذف کریں"},
+            {"DeleteHistoryMsg", "کیا آپ واقعی '{0}' کو حذف کرنا چاہتے ہیں؟ یہ آڈیو فائل کو آپ کی ڈسک سے مستقل طور پر حذف کر دے گا۔"}
         };
     }
 }
-
-

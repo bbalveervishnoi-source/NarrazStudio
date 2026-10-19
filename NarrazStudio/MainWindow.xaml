@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     Title="Narraz">
 
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
@@ -23,6 +24,8 @@
             </StackPanel>
         </Border>
 
+
+
         <Grid Grid.Row="1">
             <!-- Main Application Layout (Sidebar + Editor) -->
             <Grid x:Name="MainAppLayout" Visibility="Visible">
@@ -35,7 +38,6 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Spacing="5" Margin="25,30,25,10">
@@ -49,14 +51,7 @@
                         </StackPanel>
                     </Button>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="25" Margin="0,5,0,15">
-                        <Button x:Name="GoToSavedBtn" Click="NavigateToSaved" ToolTipService.ToolTip="{x:Bind Lang.ToolTipSaved, Mode=OneWay}" Background="Transparent" BorderThickness="0" Padding="8">
-                            <FontIcon Glyph="&#xE8B7;" FontSize="20" Opacity="0.8"/>
-                        </Button>
-                        <Button x:Name="GoToSettingsBtn" Click="NavigateToSettings" ToolTipService.ToolTip="{x:Bind Lang.ToolTipSettings, Mode=OneWay}" Background="Transparent" BorderThickness="0" Padding="8">
-                            <FontIcon Glyph="&#xE713;" FontSize="20" Opacity="0.8"/>
-                        </Button>
-                    </StackPanel>
+
                 </StackPanel>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="25,0,25,20">
@@ -150,56 +145,131 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <StackPanel Grid.Row="2" Spacing="12" Padding="25,0,25,25">
-                    <Button x:Name="GoToBatchBtn" Click="NavigateToBatch" HorizontalAlignment="Stretch" Height="45" Background="Transparent" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <FontIcon Glyph="&#xE81C;" FontSize="14"/>
-                            <TextBlock Text="{x:Bind Lang.BatchExportTitle, Mode=OneWay}" FontWeight="SemiBold"/>
-                        </StackPanel>
-                    </Button>
-                    <Button x:Name="PlayButton" Click="PlayButton_Click" HorizontalAlignment="Stretch" Height="45" Style="{ThemeResource AccentButtonStyle}" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <FontIcon Glyph="&#xE768;" FontSize="14"/>
-                            <TextBlock Text="{x:Bind Lang.PlayAudio, Mode=OneWay}" FontWeight="SemiBold"/>
-                        </StackPanel>
-                    </Button>
-                    <Button x:Name="ExportButton" Click="ExportButton_Click" HorizontalAlignment="Stretch" Height="45" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <FontIcon Glyph="&#xE78C;" FontSize="14"/>
-                            <TextBlock Text="{x:Bind Lang.ExportMP3, Mode=OneWay}" FontWeight="SemiBold"/>
-                        </StackPanel>
-                    </Button>
-                    <TextBlock x:Name="StatusLabel" Text="{x:Bind Lang.SystemReady, Mode=OneWay}" FontSize="11" Opacity="0.6" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                </StackPanel>
+
             </Grid> 
 
-            <Grid Grid.Column="1" Padding="25" x:Name="HomeView">
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                        BorderThickness="0" 
+            <Grid Grid.Column="1" x:Name="HomeView">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Modern Top Toolbar -->
+                <Border Grid.Row="0" Margin="25,20,25,0"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="12"
-                        Shadow="{StaticResource SharedShadow}" Translation="0,0,16">
+                        Padding="12,8"
+                        Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
                     <Grid>
-                        <Grid x:Name="TextContainer" Margin="10">
-                            <WebView2 x:Name="EditorWebView" 
-                                      HorizontalAlignment="Stretch" 
-                                      VerticalAlignment="Stretch"
-                                      Margin="5,5,15,5" 
-                                      WebMessageReceived="EditorWebView_WebMessageReceived" />
-                        </Grid>
-                        
-                        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" 
-                                Background="{ThemeResource ControlFillColorDefaultBrush}" 
-                                CornerRadius="6" Padding="12,6"
-                                Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
-                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                <TextBlock x:Name="WordCharCountTextBlock" Text="0 Words • 0 Characters" FontSize="12" FontWeight="Medium" Opacity="0.8" VerticalAlignment="Center"/>
-                                <Button x:Name="ClearTextButton" Padding="4" Background="Transparent" BorderThickness="0" Click="ClearTextButton_Click" ToolTipService.ToolTip="{x:Bind Lang.ToolTipClear, Mode=OneWay}">
-                                    <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="#FF4B4B"/>
-                                </Button>
-                            </StackPanel>
-                        </Border>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Action Buttons (Batch, Play, Export) -->
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+
+                            <!-- Batch Export -->
+                            <Button x:Name="GoToBatchBtn" Click="NavigateToBatch"
+                                    Background="Transparent" BorderThickness="0"
+                                    CornerRadius="8" Padding="12,8"
+                                    ToolTipService.ToolTip="{x:Bind Lang.BatchExportTitle, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE81C;" FontSize="15" Opacity="0.85"/>
+                                    <TextBlock Text="{x:Bind Lang.BatchExportTitle, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.85"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Separator -->
+                            <Border Width="1" Height="22" Background="{ThemeResource SurfaceStrokeColorDefaultBrush}" VerticalAlignment="Center" Margin="4,0"/>
+
+                            <!-- Play Audio (Accent) -->
+                            <Button x:Name="PlayButton" Click="PlayButton_Click"
+                                    Style="{ThemeResource AccentButtonStyle}"
+                                    CornerRadius="8" Padding="14,8">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE768;" FontSize="15"/>
+                                    <TextBlock Text="{x:Bind Lang.PlayAudio, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Export MP3 -->
+                            <Button x:Name="ExportButton" Click="ExportButton_Click"
+                                    Background="Transparent" BorderThickness="0"
+                                    CornerRadius="8" Padding="12,8">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE78C;" FontSize="15" Opacity="0.85"/>
+                                    <TextBlock Text="{x:Bind Lang.ExportMP3, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.85"/>
+                                </StackPanel>
+                            </Button>
+
+                        </StackPanel>
+
+                        <!-- Right: Saved &amp; Settings + Status -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+
+                            <!-- Status Label -->
+                            <TextBlock x:Name="StatusLabel" Text="{x:Bind Lang.SystemReady, Mode=OneWay}"
+                                       FontSize="11" Opacity="0.5" VerticalAlignment="Center" Margin="0,0,8,0"/>
+
+                            <!-- Separator -->
+                            <Border Width="1" Height="22" Background="{ThemeResource SurfaceStrokeColorDefaultBrush}" VerticalAlignment="Center" Margin="4,0"/>
+
+                            <!-- Saved Voices -->
+                            <Button x:Name="GoToSavedBtn" Click="NavigateToSaved"
+                                    ToolTipService.ToolTip="{x:Bind Lang.ToolTipSaved, Mode=OneWay}"
+                                    Background="Transparent" BorderThickness="0"
+                                    CornerRadius="8" Padding="10,8">
+                                <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8B7;" FontSize="15" Opacity="0.85"/>
+                                    <TextBlock Text="{x:Bind Lang.ToolTipSaved, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.85"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Settings -->
+                            <Button x:Name="GoToSettingsBtn" Click="NavigateToSettings"
+                                    ToolTipService.ToolTip="{x:Bind Lang.ToolTipSettings, Mode=OneWay}"
+                                    Background="Transparent" BorderThickness="0"
+                                    CornerRadius="8" Padding="10,8">
+                                <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE713;" FontSize="15" Opacity="0.85"/>
+                                    <TextBlock Text="{x:Bind Lang.ToolTipSettings, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.85"/>
+                                </StackPanel>
+                            </Button>
+
+                        </StackPanel>
                     </Grid>
                 </Border>
+
+                <!-- Editor Area -->
+                <Grid Grid.Row="1" Padding="25,12,25,25">
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            BorderThickness="0" 
+                            CornerRadius="12"
+                            Shadow="{StaticResource SharedShadow}" Translation="0,0,16">
+                        <Grid>
+                            <Grid x:Name="TextContainer" Margin="10">
+                                <WebView2 x:Name="EditorWebView" 
+                                          HorizontalAlignment="Stretch" 
+                                          VerticalAlignment="Stretch"
+                                          Margin="5,5,15,5" 
+                                          WebMessageReceived="EditorWebView_WebMessageReceived" />
+                            </Grid>
+                            
+                            <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" 
+                                    Background="{ThemeResource ControlFillColorDefaultBrush}" 
+                                    CornerRadius="6" Padding="12,6"
+                                    Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <TextBlock x:Name="WordCharCountTextBlock" Text="0 Words • 0 Characters" FontSize="12" FontWeight="Medium" Opacity="0.8" VerticalAlignment="Center"/>
+                                    <Button x:Name="ClearTextButton" Padding="4" Background="Transparent" BorderThickness="0" Click="ClearTextButton_Click" ToolTipService.ToolTip="{x:Bind Lang.ToolTipClear, Mode=OneWay}">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="#FF4B4B"/>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid> <!-- End MainAppLayout -->
 
@@ -250,63 +320,76 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Table Header -->
-            <Grid Grid.Row="2" Margin="15,0,15,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="150"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{x:Bind Lang.HeaderSrNo, Mode=OneWay}" FontWeight="SemiBold" Opacity="0.6"/>
-                <TextBlock Grid.Column="1" Text="{x:Bind Lang.HeaderTitle, Mode=OneWay}" FontWeight="SemiBold" Opacity="0.6"/>
-                <TextBlock Grid.Column="2" Text="{x:Bind Lang.HeaderNarrator, Mode=OneWay}" FontWeight="SemiBold" Opacity="0.6"/>
-                <TextBlock Grid.Column="3" Text="{x:Bind Lang.HeaderInfo, Mode=OneWay}" FontWeight="SemiBold" Opacity="0.6"/>
-                <TextBlock Grid.Column="4" Text="{x:Bind Lang.HeaderActions, Mode=OneWay}" FontWeight="SemiBold" Opacity="0.6" HorizontalAlignment="Right"/>
-            </Grid>
+            <!-- Saved Table Header -->
+
+
+            <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12,10" Margin="0,0,0,4" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="44"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="#" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Lang.FileNameCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{x:Bind Lang.NarratorCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="{x:Bind Lang.DateCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="{x:Bind Lang.SizeCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="{x:Bind Lang.ActionsCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </Border>
 
             <ListView Grid.Row="3" x:Name="HistoryListView" ItemsSource="{x:Bind _historyList}" SelectionMode="None">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:HistoryItem">
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderThickness="0" CornerRadius="8" Margin="0,0,0,10" Padding="15" Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12,10" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="44"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="110"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="200"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- Sr No -->
-                                <TextBlock Grid.Column="0" Text="{x:Bind SrNo}" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Opacity="0.5"/>
+                                <TextBlock Text="{x:Bind SrNo}" FontSize="13" Opacity="0.5" VerticalAlignment="Center"/>
 
-                                <!-- Title and Date -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Text="{x:Bind FileName}" FontSize="16" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{x:Bind DateString}" FontSize="12" Opacity="0.6"/>
-                                </StackPanel>
+                                <!-- File Name -->
+                                <TextBlock Grid.Column="1" Text="{x:Bind FileName}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
 
                                 <!-- Narrator -->
-                                <TextBlock Grid.Column="2" Text="{x:Bind VoiceName}" VerticalAlignment="Center" FontSize="13" Opacity="0.8" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Column="2" Text="{x:Bind VoiceName}" FontSize="12" Opacity="0.75" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
 
-                                <!-- General Info -->
-                                <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="2" Opacity="0.7">
-                                    <TextBlock FontSize="12"><Run Text="{x:Bind CharCount}"/> <Run Text="{x:Bind Lang.Chars, Mode=OneWay}"/></TextBlock>
-                                    <TextBlock FontSize="12"><Run Text="{x:Bind WordCount}"/> <Run Text="{x:Bind Lang.Words, Mode=OneWay}"/></TextBlock>
-                                </StackPanel>
+                                <!-- Date + Time -->
+                                <TextBlock Grid.Column="3" Text="{x:Bind DateString}" FontSize="12" Opacity="0.75" VerticalAlignment="Center"/>
 
-                                <!-- Quick Actions -->
-                                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipOpen, Mode=OneWay}" Click="OpenHistoryFile_Click" Background="Transparent" BorderThickness="0">
-                                        <FontIcon Glyph="&#xE8A5;" FontSize="16"/>
+                                <!-- Size -->
+                                <TextBlock Grid.Column="4" Text="{x:Bind FileSizeStr}" FontSize="12" Opacity="0.75" VerticalAlignment="Center"/>
+
+                                <!-- Actions -->
+                                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <!-- Open File -->
+                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipOpen, Mode=OneWay}" Click="OpenHistoryFile_Click" Style="{ThemeResource AccentButtonStyle}" Padding="10,6">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE768;" FontSize="12"/>
+                                            <TextBlock Text="Open" FontSize="12"/>
+                                        </StackPanel>
                                     </Button>
-                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipFolder, Mode=OneWay}" Click="OpenHistoryFolder_Click" Background="Transparent" BorderThickness="0">
-                                        <FontIcon Glyph="&#xED25;" FontSize="16"/>
+                                    <!-- Locate -->
+                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipFolder, Mode=OneWay}" Click="OpenHistoryFolder_Click" Background="Transparent" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Padding="10,6">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE8DA;" FontSize="12"/>
+                                            <TextBlock Text="Locate" FontSize="12"/>
+                                        </StackPanel>
                                     </Button>
-                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipDelete, Mode=OneWay}" Click="DeleteHistoryItem_Click" Background="Transparent" BorderThickness="0">
-                                        <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#FF4B4B"/>
+                                    <!-- Delete -->
+                                    <Button ToolTipService.ToolTip="{x:Bind Lang.ToolTipDelete, Mode=OneWay}" Click="DeleteHistoryItem_Click" Background="Transparent" BorderThickness="0" Padding="8,6">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="15" Foreground="#FF4B4B"/>
                                     </Button>
                                 </StackPanel>
                             </Grid>
@@ -352,6 +435,7 @@
                                 <ComboBoxItem Content="{x:Bind Lang.Light, Mode=OneWay}" Tag="Light"/>
                                 <ComboBoxItem Content="{x:Bind Lang.Dark, Mode=OneWay}" Tag="Dark"/>
                                 <ComboBoxItem Content="{x:Bind Lang.SystemDefault, Mode=OneWay}" Tag="System"/>
+                                <ComboBoxItem Content="{x:Bind Lang.ThemeAqua, Mode=OneWay}" Tag="Aqua"/>
                             </ComboBox>
                         </Grid>
                     </Border>
@@ -526,11 +610,13 @@
         <Grid x:Name="BatchView" Visibility="Collapsed" Grid.Row="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Padding="40">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,0,0,30">
+            <!-- Header: Back, Title, Open Files, Clear All -->
+            <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,0,0,18">
                 <Button Click="NavigateToHome" ToolTipService.ToolTip="{x:Bind Lang.BackToHome, Mode=OneWay}" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Padding="8">
                     <FontIcon Glyph="&#xE72B;" FontSize="24"/>
                 </Button>
@@ -549,66 +635,211 @@
                 </Button>
             </StackPanel>
 
-            <ListView Grid.Row="1" x:Name="BatchFilesList" SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="local:BatchExportItem">
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,10" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="5" Margin="0,0,20,0">
-                                    <TextBlock Text="{x:Bind FileName}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{x:Bind FileSizeStr}" FontSize="12" Opacity="0.6"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
-                                        <TextBlock Text="{x:Bind StatusText, Mode=OneWay}" FontSize="12" Opacity="0.8" VerticalAlignment="Center"/>
-                                        <FontIcon Glyph="&#xE73E;" FontSize="14" Foreground="#4CAF50" Visibility="{x:Bind CheckmarkVisibility, Mode=OneWay}" VerticalAlignment="Center"/>
+            <!-- Tab Bar -->
+            <Grid Grid.Row="1" Width="360" Height="40" HorizontalAlignment="Left" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Margin="0,0,0,20" Padding="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Converting Tab -->
+                <Button x:Name="BatchTabConvertingBtn" Click="BatchTabConverting_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="6" Padding="0">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock x:Name="BatchTabConvertingText" Text="{x:Bind Lang.Converting, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="BatchTabConvertingIndicator" Height="3" Fill="{ThemeResource SystemAccentColor}" RadiusX="1.5" RadiusY="1.5" Opacity="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="12,0,12,2"/>
+                    </Grid>
+                </Button>
+
+                <!-- Finished Tab -->
+                <Button x:Name="BatchTabFinishedBtn" Click="BatchTabFinished_Click" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="6" Padding="0">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock x:Name="BatchTabFinishedText" Text="{x:Bind Lang.Finished, Mode=OneWay}" FontSize="13" FontWeight="Normal" Opacity="0.6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="BatchTabFinishedIndicator" Height="3" Fill="{ThemeResource SystemAccentColor}" RadiusX="1.5" RadiusY="1.5" Opacity="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="12,0,12,2"/>
+                    </Grid>
+                </Button>
+            </Grid>
+
+            <!-- Converting Panel (existing) -->
+            <Grid x:Name="BatchConvertingPanel" Grid.Row="2">
+                <!-- Empty State Box -->
+                <Border x:Name="BatchEmptyStatePanel" Visibility="Visible" BorderThickness="1.5" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" CornerRadius="12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Margin="0,0,15,10" Padding="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="300" AllowDrop="True" DragOver="BatchFilesList_DragOver" Drop="BatchFilesList_Drop">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                        <!-- Music Folder Icon -->
+                        <FontIcon Glyph="&#xED25;" FontSize="54" Foreground="{ThemeResource SystemAccentColor}" Opacity="0.8"/>
+                        
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <!-- Add File Button -->
+                            <Button Click="BatchOpenFiles_Click" Style="{ThemeResource AccentButtonStyle}" Padding="24,12" CornerRadius="6" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE710;" FontSize="14" FontWeight="Bold"/>
+                                    <TextBlock Text="{x:Bind Lang.AddFileBtn, Mode=OneWay}" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Sub-label -->
+                        <TextBlock Text="{x:Bind Lang.DragDropFileHere, Mode=OneWay}" FontSize="14" Opacity="0.6" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <ListView x:Name="BatchFilesList" SelectionMode="None" Visibility="Collapsed"
+                          AllowDrop="True" DragOver="BatchFilesList_DragOver" Drop="BatchFilesList_Drop"
+                          CanReorderItems="True" CanDragItems="True" DragItemsStarting="BatchFilesList_DragItemsStarting">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:BatchExportItem">
+                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,10" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Shadow="{StaticResource SharedShadow}" Translation="0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="5" Margin="0,0,20,0">
+                                        <TextBlock Text="{x:Bind FileName}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{x:Bind FileSizeStr}" FontSize="12" Opacity="0.6"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
+                                            <TextBlock Text="{x:Bind StatusText, Mode=OneWay}" FontSize="12" Opacity="0.8" VerticalAlignment="Center"/>
+                                            <FontIcon Glyph="&#xE73E;" FontSize="14" Foreground="#4CAF50" Visibility="{x:Bind CheckmarkVisibility, Mode=OneWay}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Maximum="100" Margin="0,5,0,0" Foreground="{ThemeResource SystemAccentColor}" Visibility="{x:Bind ProgressVisibility, Mode=OneWay}"/>
                                     </StackPanel>
-                                    <ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Maximum="100" Margin="0,5,0,0" Foreground="{ThemeResource SystemAccentColor}" Visibility="{x:Bind ProgressVisibility, Mode=OneWay}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                    <!-- Convert Button -->
-                                    <Button Click="BatchConvertSingle_Click" Style="{ThemeResource AccentButtonStyle}" Visibility="{x:Bind ConvertBtnVisibility, Mode=OneWay}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE78C;" FontSize="12"/>
-                                            <TextBlock Text="{x:Bind Lang.Convert, Mode=OneWay}"/>
-                                        </StackPanel>
-                                    </Button>
-                                    
-                                    <!-- Cancel Button -->
-                                    <Button Click="BatchCancelSingle_Click" Background="#22FF4B4B" BorderThickness="0" Visibility="{x:Bind CancelBtnVisibility, Mode=OneWay}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#FF4B4B"/>
-                                            <TextBlock Text="Cancel" Foreground="#FF4B4B"/>
-                                        </StackPanel>
-                                    </Button>
-                                    
-                                    <!-- Locate Button -->
-                                    <Button Click="BatchLocateSingle_Click" Background="Transparent" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Visibility="{x:Bind LocateBtnVisibility, Mode=OneWay}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE8DA;" FontSize="12"/>
-                                            <TextBlock Text="{x:Bind Lang.Locate, Mode=OneWay}"/>
-                                        </StackPanel>
-                                    </Button>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <!-- Convert Button -->
+                                        <Button Click="BatchConvertSingle_Click" Style="{ThemeResource AccentButtonStyle}" Visibility="{x:Bind ConvertBtnVisibility, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE78C;" FontSize="12"/>
+                                                <TextBlock Text="{x:Bind Lang.Convert, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        
+                                        <!-- Cancel Button -->
+                                        <Button Click="BatchCancelSingle_Click" Background="#22FF4B4B" BorderThickness="0" Visibility="{x:Bind CancelBtnVisibility, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#FF4B4B"/>
+                                                <TextBlock Text="Cancel" Foreground="#FF4B4B"/>
+                                            </StackPanel>
+                                        </Button>
+                                        
+                                        <!-- Locate Button -->
+                                        <Button Click="BatchLocateSingle_Click" Background="Transparent" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Visibility="{x:Bind LocateBtnVisibility, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE8DA;" FontSize="12"/>
+                                                <TextBlock Text="{x:Bind Lang.Locate, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </Button>
 
-                                    <Button Click="BatchDeleteItem_Click" Background="Transparent" BorderThickness="0" IsEnabled="{x:Bind IsDeleteEnabled, Mode=OneWay}">
-                                        <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#FF4B4B"/>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="Padding" Value="0,0,15,0"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
+                                        <Button Click="BatchDeleteItem_Click" Background="Transparent" BorderThickness="0" IsEnabled="{x:Bind IsDeleteEnabled, Mode=OneWay}">
+                                            <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#FF4B4B"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0,0,15,0"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
 
-            <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="12" Padding="20" Margin="0,20,0,0" BorderThickness="0" Shadow="{StaticResource SharedShadow}" Translation="0,0,16">
+            <!-- Finished Panel (new Completed list) -->
+            <Grid x:Name="BatchFinishedPanel" Grid.Row="2" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Column headers -->
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12,10" Margin="0,0,0,4" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="44"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="#" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind Lang.FileNameCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind Lang.NarratorCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="{x:Bind Lang.DateCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="{x:Bind Lang.SizeCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="{x:Bind Lang.ActionsCol, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Opacity="0.55" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Rows -->
+                <ListView x:Name="CompletedList" Grid.Row="1" SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12,10" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="200"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Sr No -->
+                                    <TextBlock Text="{Binding SrNo}" FontSize="13" Opacity="0.5" VerticalAlignment="Center"/>
+
+                                    <!-- File Name -->
+                                    <TextBlock Grid.Column="1" Text="{Binding FileName}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                                    <!-- Narrator -->
+                                    <TextBlock Grid.Column="2" Text="{Binding VoiceName}" FontSize="12" Opacity="0.75" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+
+                                    <!-- Date + Time -->
+                                    <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Text="{Binding DateString}" FontSize="12" Opacity="0.75"/>
+                                        <TextBlock Text="{Binding TimeString}" FontSize="11" Opacity="0.5"/>
+                                    </StackPanel>
+
+                                    <!-- Size -->
+                                    <TextBlock Grid.Column="4" Text="{Binding FileSizeStr}" FontSize="12" Opacity="0.75" VerticalAlignment="Center"/>
+
+                                    <!-- Actions -->
+                                    <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <!-- Open File -->
+                                        <Button Click="CompletedOpenFile_Click" Style="{ThemeResource AccentButtonStyle}" Padding="10,6">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE768;" FontSize="12"/>
+                                                <TextBlock Text="Open" FontSize="12"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <!-- Locate -->
+                                        <Button Click="CompletedLocate_Click" Background="Transparent" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Padding="10,6">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE8DA;" FontSize="12"/>
+                                                <TextBlock Text="Locate" FontSize="12"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <!-- Delete -->
+                                        <Button Click="CompletedDelete_Click" Background="Transparent" BorderThickness="0" Padding="8,6">
+                                            <FontIcon Glyph="&#xE74D;" FontSize="15" Foreground="#FF4B4B"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+
+            <!-- Footer: Save path + Export controls (only visible on Converting tab) -->
+            <Border Grid.Row="3" x:Name="BatchFooter" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="12" Padding="20" Margin="0,20,0,0" BorderThickness="0" Shadow="{StaticResource SharedShadow}" Translation="0,0,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>

@@ -15,8 +15,8 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # Per-chunk timeout in seconds. If a chunk takes longer, it is retried.
-CHUNK_TIMEOUT_SECONDS = 45
-MAX_RETRIES = 2
+CHUNK_TIMEOUT_SECONDS = 180
+MAX_RETRIES = 5
 
 async def list_voices():
     voices = await edge_tts.VoicesManager.create()
@@ -61,7 +61,7 @@ async def _generate_chunk_with_retry(i, chunk, voice, rate, pitch, temp_folder, 
             if attempt > 0:
                 print(f"STATUS: Retrying chunk {i+1}/{total_chunks} (attempt {attempt+1})...")
                 sys.stdout.flush()
-                await asyncio.sleep(2)  # Brief pause before retry
+                await asyncio.sleep(5)  # Brief pause before retry
 
             communicate = edge_tts.Communicate(chunk, voice, rate=rate, pitch=pitch)
 
