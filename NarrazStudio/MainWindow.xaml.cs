@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Dispatching;
@@ -50,18 +51,26 @@ namespace NarrazStudio
         public int CharCount { get; set; }
         public int WordCount { get; set; }
         public int SrNo { get; set; }
+        [JsonIgnore]
         public LanguageManager Lang => LanguageManager.Instance;
+        [JsonIgnore]
         public string FileSizeStr
         {
             get
             {
                 try
                 {
-                    if (System.IO.File.Exists(FilePath))
+                    if (!string.IsNullOrEmpty(FilePath) && System.IO.File.Exists(FilePath))
                     {
                         long bytes = new System.IO.FileInfo(FilePath).Length;
-                        double mb = bytes / (1024.0 * 1024.0);
-                        return $"{mb:F2} MB";
+                        if (bytes > 0)
+                        {
+                            double mb = bytes / (1024.0 * 1024.0);
+                            if (mb >= 0.01)
+                                return $"{mb:F2} MB";
+                            double kb = bytes / 1024.0;
+                            return $"{kb:F1} KB";
+                        }
                     }
                 }
                 catch { }
@@ -172,10 +181,10 @@ namespace NarrazStudio
         private bool _isInternetError = false;
         private bool _isLoaded = false;
         public LanguageManager Lang => LanguageManager.Instance;
+        private readonly object _historyLock = new();
         private ObservableCollection<HistoryItem> _historyList = new();
         private List<HistoryItem> _fullHistory = new();
         private string _historyFilePath = "";
-        private string _selectedPeriod = "All Records";
         private ObservableCollection<BatchExportItem> _batchItems = new();
         private ObservableCollection<BatchCompletedItem> _completedItems = new();
         private string _batchSavePath = "";
@@ -429,41 +438,69 @@ namespace NarrazStudio
         private void LoadHistory()
         {
             try {
-                if (File.Exists(_historyFilePath)) {
-                    string json = File.ReadAllText(_historyFilePath);
-                    var items = JsonSerializer.Deserialize<List<HistoryItem>>(json);
-                    if (items != null) {
-                        _fullHistory = items.OrderByDescending(x => x.Timestamp).ToList();
-                        UpdateHistoryUI(_fullHistory);
+                lock (_historyLock)
+                {
+                    if (File.Exists(_historyFilePath)) {
+                        string json = File.ReadAllText(_historyFilePath);
+                        var items = JsonSerializer.Deserialize<List<HistoryItem>>(json);
+                        if (items != null) {
+                            _fullHistory = items.OrderByDescending(x => x.Timestamp).ToList();
+                        }
                     }
                 }
+                if (_isLoaded)
+                    ApplyAdvancedFilters();
+                else
+                    UpdateHistoryUI(_fullHistory);
             } catch { }
         }
 
         private void SaveHistory()
         {
             try {
-                string json = JsonSerializer.Serialize(_fullHistory);
-                File.WriteAllText(_historyFilePath, json);
+                lock (_historyLock)
+                {
+                    if (string.IsNullOrEmpty(_historyFilePath)) return;
+                    string? dir = Path.GetDirectoryName(_historyFilePath);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+                    string json = JsonSerializer.Serialize(_fullHistory, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(_historyFilePath, json);
+                }
             } catch { }
         }
 
         // Add new export record to history
-        private void AddToHistory(string fileName, string filePath, int chars, int words)
+        private void AddToHistory(string fileName, string filePath, int chars, int words, string? voiceName = null)
         {
             var now = DateTime.Now;
             var item = new HistoryItem {
                 FileName = fileName,
                 FilePath = filePath,
-                VoiceName = _selectedVoice?.Name ?? "Unknown",
+                VoiceName = !string.IsNullOrEmpty(voiceName) ? voiceName : (_selectedVoice?.Name ?? "Unknown"),
                 Timestamp = now,
                 DateIso = now.ToString("yyyy-MM-dd"),
                 DateString = now.ToString("dd MMM yyyy, HH:mm"),
                 CharCount = chars,
                 WordCount = words
             };
-            _fullHistory.Insert(0, item);
-            ApplyAdvancedFilters();
+
+            lock (_historyLock)
+            {
+                _fullHistory.Insert(0, item);
+                SaveHistory();
+            }
+
+            if (DispatcherQueue != null && !DispatcherQueue.HasThreadAccess)
+            {
+                DispatcherQueue.TryEnqueue(() => ApplyAdvancedFilters());
+            }
+            else
+            {
+                ApplyAdvancedFilters();
+            }
         }
 
         private void UpdateFilteringOptions() { }
@@ -491,6 +528,7 @@ namespace NarrazStudio
             HistoryView.Visibility = Visibility.Visible;
             SettingsView.Visibility = Visibility.Collapsed;
             BatchView.Visibility = Visibility.Collapsed;
+            ApplyAdvancedFilters();
         }
 
         private void NavigateToSettings(object sender, RoutedEventArgs e)
@@ -853,25 +891,63 @@ namespace NarrazStudio
         private void FilterDateSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_isLoaded) return;
-            if (FilterDateSelector?.SelectedItem is ComboBoxItem item)
-            {
-                _selectedPeriod = item.Content?.ToString() ?? "All Records";
-                ApplyAdvancedFilters();
-            }
+            ApplyAdvancedFilters();
         }
 
         // Apply date + text search filters to history
         private void ApplyAdvancedFilters()
         {
-            if (!_isLoaded || HistorySearchBox == null) return;
+            if (DispatcherQueue != null && !DispatcherQueue.HasThreadAccess)
+            {
+                DispatcherQueue.TryEnqueue(() => ApplyAdvancedFilters());
+                return;
+            }
+
+            if (!_isLoaded) return;
+
             var filtered = _fullHistory.AsEnumerable();
             DateTime now = DateTime.Now.Date;
-            if (_selectedPeriod == "Today") filtered = filtered.Where(x => x.Timestamp.Date == now);
-            else if (_selectedPeriod == "Yesterday") filtered = filtered.Where(x => x.Timestamp.Date == now.AddDays(-1));
-            else if (_selectedPeriod == "Last Week") filtered = filtered.Where(x => x.Timestamp.Date >= now.AddDays(-7));
-            string query = HistorySearchBox.Text.ToLower();
-            if (!string.IsNullOrEmpty(query)) filtered = filtered.Where(x => x.FileName.ToLower().Contains(query));
-            UpdateHistoryUI(filtered.ToList());
+            int dateIndex = FilterDateSelector?.SelectedIndex ?? 0;
+            switch (dateIndex)
+            {
+                case 1: // Today
+                    filtered = filtered.Where(x => x.Timestamp.Date == now);
+                    break;
+                case 2: // Yesterday
+                    filtered = filtered.Where(x => x.Timestamp.Date == now.AddDays(-1));
+                    break;
+                case 3: // Last Week
+                    filtered = filtered.Where(x => x.Timestamp.Date >= now.AddDays(-7));
+                    break;
+            }
+
+            if (HistorySearchBox != null && !string.IsNullOrWhiteSpace(HistorySearchBox.Text))
+            {
+                string query = HistorySearchBox.Text.Trim().ToLower();
+                filtered = filtered.Where(x => (x.FileName != null && x.FileName.ToLower().Contains(query)) ||
+                                               (x.VoiceName != null && x.VoiceName.ToLower().Contains(query)));
+            }
+
+            int sortIndex = SortSelector?.SelectedIndex ?? 0;
+            List<HistoryItem> sortedList;
+            switch (sortIndex)
+            {
+                case 1: // Oldest
+                    sortedList = filtered.OrderBy(x => x.Timestamp).ToList();
+                    break;
+                case 2: // Name A-Z
+                    sortedList = filtered.OrderBy(x => x.FileName).ToList();
+                    break;
+                case 3: // Char count
+                    sortedList = filtered.OrderByDescending(x => x.CharCount).ToList();
+                    break;
+                case 0: // Newest (default)
+                default:
+                    sortedList = filtered.OrderByDescending(x => x.Timestamp).ToList();
+                    break;
+            }
+
+            UpdateHistoryUI(sortedList);
         }
 
         private void HistorySearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) => ApplyAdvancedFilters();
@@ -880,24 +956,17 @@ namespace NarrazStudio
         private void SortSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_isLoaded) return;
-            if (SortSelector?.SelectedItem is ComboBoxItem selected)
-            {
-                string option = selected.Content?.ToString() ?? "";
-                List<HistoryItem> sorted;
-                switch (option)
-                {
-                    case "Date (Newest)": sorted = _fullHistory.OrderByDescending(x => x.Timestamp).ToList(); break;
-                    case "Date (Oldest)": sorted = _fullHistory.OrderBy(x => x.Timestamp).ToList(); break;
-                    case "Name (A-Z)": sorted = _fullHistory.OrderBy(x => x.FileName).ToList(); break;
-                    case "Char Count": sorted = _fullHistory.OrderByDescending(x => x.CharCount).ToList(); break;
-                    default: sorted = _fullHistory; break;
-                }
-                UpdateHistoryUI(sorted);
-            }
+            ApplyAdvancedFilters();
         }
 
         private void UpdateHistoryUI(List<HistoryItem> list)
         {
+            if (DispatcherQueue != null && !DispatcherQueue.HasThreadAccess)
+            {
+                DispatcherQueue.TryEnqueue(() => UpdateHistoryUI(list));
+                return;
+            }
+
             _historyList.Clear();
             int index = 1;
             foreach (var item in list)
@@ -1291,14 +1360,22 @@ namespace NarrazStudio
                     {
                         item.IsCompleted = true;
                         item.StatusText = "Completed";
+                        
+                        int chars = 0;
+                        int words = 0;
                         try {
-                            string fullText = await File.ReadAllTextAsync(item.FilePath);
-                            int chars = fullText.Length;
-                            int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
-                            string safePath = "";
-                            try { safePath = item.OutputFilePath; } catch { }
-                            AddToHistory(Path.GetFileName(item.OutputFilePath), safePath, chars, words);
+                            if (File.Exists(item.FilePath)) {
+                                string fullText = await File.ReadAllTextAsync(item.FilePath);
+                                chars = fullText.Length;
+                                words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                            }
                         } catch { }
+
+                        string safePath = item.OutputFilePath ?? "";
+                        string exportName = !string.IsNullOrEmpty(safePath) ? Path.GetFileName(safePath) : (Path.GetFileNameWithoutExtension(item.FileName) + ".mp3");
+
+                        AddToHistory(exportName, safePath, chars, words, _selectedVoice?.Name);
+
                         DispatcherQueue.TryEnqueue(() => {
                             AddToCompletedTab(item);
                             _batchItems.Remove(item);
@@ -1408,14 +1485,22 @@ namespace NarrazStudio
                 {
                     item.IsCompleted = true;
                     item.StatusText = "Completed";
+                    
+                    int chars = 0;
+                    int words = 0;
                     try {
-                        string fullText = await File.ReadAllTextAsync(item.FilePath);
-                        int chars = fullText.Length;
-                        int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
-                        string safePath = "";
-                        try { safePath = item.OutputFilePath; } catch { }
-                        AddToHistory(Path.GetFileName(item.OutputFilePath), safePath, chars, words);
+                        if (File.Exists(item.FilePath)) {
+                            string fullText = await File.ReadAllTextAsync(item.FilePath);
+                            chars = fullText.Length;
+                            words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                        }
                     } catch { }
+
+                    string safePath = item.OutputFilePath ?? "";
+                    string exportName = !string.IsNullOrEmpty(safePath) ? Path.GetFileName(safePath) : (Path.GetFileNameWithoutExtension(item.FileName) + ".mp3");
+
+                    AddToHistory(exportName, safePath, chars, words, _selectedVoice?.Name);
+
                     DispatcherQueue.TryEnqueue(() => {
                         AddToCompletedTab(item);
                         _batchItems.Remove(item);
@@ -1860,7 +1945,7 @@ namespace NarrazStudio
                         try {
                             int chars = fullText.Length;
                             int words = fullText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
-                            AddToHistory(file.Name, safePath, chars, words);
+                            AddToHistory(file.Name, safePath, chars, words, _selectedVoice?.Name);
                         } catch { }
 
                         ShowOverlayState("Success");

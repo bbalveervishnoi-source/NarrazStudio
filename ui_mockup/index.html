@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narraz (नराज़) — High-Fidelity UI Design Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       GLOBAL PRESENTATION STYLES & RESET
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --app-font: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', 'Noto Sans Devanagari', -apple-system, sans-serif;
+      --mono-font: 'JetBrains Mono', Consolas, monospace;
+      
+      /* Viewer Frame Shell Colors */
+      --shell-bg: #090A0B;
+      --shell-nav: #141517;
+      --shell-border: rgba(255, 255, 255, 0.08);
+      --shell-text: #E5E7EB;
+      --shell-text-muted: #9CA3AF;
+      --shell-accent: #38BDF8;
+    }
+
+    body {
+      font-family: var(--app-font);
+      background-color: var(--shell-bg);
+      color: var(--shell-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Viewer Top Header */
+    .viewer-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(16, 17, 19, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--shell-border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .viewer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+    }
+
+    .viewer-badge.live {
+      color: #34D399;
+      background: rgba(52, 211, 153, 0.1);
+      border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .viewer-badge.live::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+    }
+
+    .viewer-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #F3F4F6;
+    }
+
+    .viewer-title span {
+      color: #9CA3AF;
+      font-weight: 400;
+      font-size: 13px;
+      margin-left: 6px;
+    }
+
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .view-segmented-control {
+      display: inline-flex;
+      background: #17181A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .view-btn {
+      background: transparent;
+      border: none;
+      color: var(--shell-text-muted);
+      padding: 6px 13px;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: inherit;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .view-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .view-btn.active {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #E5E7EB;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      border-radius: 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      transform: translateY(-1px);
+    }
+
+    .action-btn.primary {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #FFF;
+    }
+
+    /* Presentation Canvas Stage */
+    .presentation-stage {
+      flex: 1;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .mockups-grid {
+      display: grid;
+      grid-template-columns: minmax(580px, 1fr) minmax(580px, 1fr);
+      gap: 24px;
+      width: 100%;
+      transition: all 0.25s ease;
+    }
+
+    .mockups-grid.single-dark {
+      grid-template-columns: 1fr;
+    }
+    .mockups-grid.single-dark .theme-container.light-theme-wrapper {
+      display: none;
+    }
+
+    .mockups-grid.single-light {
+      grid-template-columns: 1fr;
+    }
+    .mockups-grid.single-light .theme-container.dark-theme-wrapper {
+      display: none;
+    }
+
+    /* Theme Container Card */
+    .theme-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .theme-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 6px;
+    }
+
+    .theme-header-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #D1D5DB;
+    }
+
+    .theme-chip {
+      font-size: 11px;
+      font-family: var(--mono-font);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .theme-chip.dark {
+      background: #191A1B;
+      color: #9CA3AF;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .theme-chip.light {
+      background: #E5E7EB;
+      color: #374151;
+      border: 1px solid #D1D5DB;
+    }
+
+    .theme-spec-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .spec-pill {
+      font-size: 11px;
+      color: #9CA3AF;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ==========================================================================
+       DESKTOP APPLICATION WINDOW FRAME SIMULATION
+       ========================================================================== */
+    .desktop-window {
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 760px; /* Spacious, zero element cutoff */
+      position: relative;
+      user-select: none;
+      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
+      container-type: inline-size;
+      container-name: desktopApp;
+    }
+
+    /* Window Title Bar */
+    .app-titlebar {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      flex-shrink: 0;
+      border-bottom: 1px solid transparent;
+    }
+
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .titlebar-icon {
+      width: 15px;
+      height: 15px;
+      object-fit: contain;
+      border-radius: 3px;
+    }
+
+    .titlebar-text {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-controls-btn {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Application Body Layout */
+    .app-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100% - 36px);
+    }
+
+    /* ==========================================================================
+       SIDEBAR LAYOUT & SKELETON
+       ========================================================================== */
+    .app-sidebar {
+      width: 275px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 14px 18px 14px;
+      position: relative;
+      border-right: 1px solid transparent;
+      height: 100%;
+    }
+
+    /* Top Branding Group */
+    .branding-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      /* Generous vertical gap cushion immediately underneath branding */
+      margin-bottom: 34px;
+      flex-shrink: 0;
+    }
+
+    .branding-logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .branding-logo-box:hover {
+      transform: scale(1.05);
+    }
+
+    .branding-logo-box img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .branding-app-name {
+      font-size: 16.5px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+
+    .branding-subtitle {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      opacity: 0.6;
+    }
+
+    /* Generic Sidebar Groups */
+    .sidebar-group-container {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .group-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      margin-bottom: 6px;
+      padding-left: 6px;
+      opacity: 0.45;
+    }
+
+    /* Navigation item reset & styling */
+    button.sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9.5px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid transparent;
+      background: transparent; /* Reset default browser button face! */
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+      transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .nav-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    /* Spacer between Middle and Bottom groups */
+    .sidebar-spacer {
+      flex: 1;
+      min-height: 20px;
+    }
+
+    /* Bottom Queue Group: Anchored to Bottom */
+    .bottom-queue-group {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid transparent;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       MAIN WORKSPACE AREA
+       ========================================================================== */
+    .app-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 18px 18px 18px;
+      overflow: hidden;
+      gap: 14px;
+      height: 100%;
+      min-width: 0;
+    }
+
+    /* Header Controls Card */
+    .workspace-header-card {
+      border-radius: 11px;
+      padding: 13px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1.05fr;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+      border: 1px solid transparent;
+      position: relative;
+    }
+
+    .header-col-left, .header-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .header-col-divider {
+      width: 1px;
+      height: 100%;
+      min-height: 60px;
+    }
+
+    .control-group-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-group-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.85;
+      letter-spacing: -0.01em;
+    }
+
+    .control-group-title svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .refresh-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 3px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .refresh-btn svg {
+      width: 12.5px;
+      height: 12.5px;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Voice Selection Dropdown */
+    .voice-selector-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8.5px 12px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.18s ease;
+      min-width: 0;
+    }
+
+    .voice-selected-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .voice-pulse-dot {
+      width: 6.5px;
+      height: 6.5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .voice-name-text {
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    .voice-tag {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 500;
+      margin-left: 4px;
+      flex-shrink: 0;
+    }
+
+    .chevron-icon {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex-shrink: 0;
+      margin-left: 6px;
+      opacity: 0.6;
+    }
+
+    /* Audio Adjustment Sliders */
+    .sliders-container {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 74px 1fr 38px 20px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slider-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      opacity: 0.85;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .slider-control-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Custom Sliders: STRICT ZERO BRIGHT BLUE BARS */
+    .app-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 22px;
+      outline: none;
+      cursor: pointer;
+      background: transparent;
+      position: relative;
+      z-index: 2;
+    }
+
+    .slider-val-badge {
+      font-size: 11px;
+      font-family: var(--mono-font);
+      font-weight: 500;
+      text-align: right;
+      opacity: 0.85;
+    }
+
+    .slider-reset-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      border-radius: 4px;
+      opacity: 0.55;
+      transition: opacity 0.15s ease;
+    }
+
+    .slider-reset-btn:hover {
+      opacity: 1;
+    }
+
+    .slider-reset-btn svg {
+      width: 11px;
+      height: 11px;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* ==========================================================================
+       MAIN TEXT CANVAS
+       ========================================================================== */
+    .workspace-canvas-card {
+      flex: 1;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .canvas-textarea {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      padding: 20px 22px;
+      font-family: var(--app-font);
+      font-size: 14px;
+      line-height: 1.7;
+      letter-spacing: -0.01em;
+      user-select: text;
+    }
+
+    .canvas-footer {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 11px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .counter-text {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: var(--mono-font);
+      letter-spacing: -0.01em;
+    }
+
+    .canvas-clear-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      border-radius: 4px;
+      opacity: 0.65;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .canvas-clear-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .canvas-clear-btn svg {
+      width: 12px;
+      height: 12px;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE CONTAINER ADAPTATIONS (SMOOTH SIDE-BY-SIDE & COMPACT SCALING)
+       ========================================================================== */
+    @container desktopApp (max-width: 820px) {
+      .app-sidebar {
+        width: 235px;
+        padding: 16px 10px 14px 10px;
+      }
+      .branding-group {
+        margin-bottom: 22px;
+      }
+      .branding-logo-box {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 8px;
+      }
+      .branding-logo-box img {
+        width: 28px;
+        height: 28px;
+      }
+      .branding-app-name {
+        font-size: 15px;
+      }
+      .branding-subtitle {
+        font-size: 10px;
+      }
+      button.sidebar-nav-item {
+        padding: 8px 10px;
+        font-size: 12px;
+        gap: 9px;
+      }
+      .nav-icon svg {
+        width: 15px;
+        height: 15px;
+      }
+      .app-workspace {
+        padding: 12px 14px 14px 14px;
+        gap: 12px;
+      }
+      .workspace-header-card {
+        grid-template-columns: 1fr;
+        padding: 11px 13px;
+        gap: 12px;
+      }
+      .header-col-divider {
+        display: none;
+      }
+      .slider-row {
+        grid-template-columns: 66px 1fr 34px 18px;
+      }
+      .canvas-textarea {
+        padding: 16px 18px;
+        font-size: 13.5px;
+      }
+    }
+
+    /* ==========================================================================
+       THEME 1: DEEP BLACK DARK THEME (VS CODE 2026 DARK DEFAULT SPECIFICATION)
+       Main Background: #121314
+       Sidebar & Overlays: #191A1B
+       Accents: Zero bright blue bars. Semi-transparent frosted-glass morphic glaze.
+       ========================================================================== */
+    .dark-theme-wrapper .desktop-window {
+      background-color: #121314; /* Deep Black Main Canvas */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      color: #EDEDED;
+    }
+
+    .dark-theme-wrapper .app-titlebar {
+      background: #151617;
+      border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+    .dark-theme-wrapper .titlebar-text {
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .dark-theme-wrapper .window-controls-btn.close { background: #E05252; opacity: 0.75; }
+    .dark-theme-wrapper .window-controls-btn.min { background: #E5A84B; opacity: 0.75; }
+    .dark-theme-wrapper .window-controls-btn.max { background: #4BB368; opacity: 0.75; }
+
+    /* Dark Sidebar: #191A1B low-contrast flattening */
+    .dark-theme-wrapper .app-sidebar {
+      background-color: #191A1B;
+      border-right-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .dark-theme-wrapper .branding-logo-box {
+      background: #141516;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .dark-theme-wrapper .branding-app-name {
+      color: #F4F4F5;
+    }
+    .dark-theme-wrapper .branding-subtitle {
+      color: #9CA3AF;
+    }
+
+    /* Inactive nav buttons in Dark Theme */
+    .dark-theme-wrapper button.sidebar-nav-item {
+      color: #9CA3AF;
+      background: transparent;
+      border-color: transparent;
+    }
+    .dark-theme-wrapper button.sidebar-nav-item svg {
+      stroke: #9CA3AF;
+    }
+
+    .dark-theme-wrapper button.sidebar-nav-item:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .dark-theme-wrapper button.sidebar-nav-item:hover svg {
+      stroke: #FFFFFF;
+    }
+
+    /* Dark Theme ACTIVE State: Premium Semi-Transparent Frosted-Glass (Morphic Glaze) */
+    .dark-theme-wrapper button.sidebar-nav-item.active {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .dark-theme-wrapper button.sidebar-nav-item.active svg {
+      stroke: #FFFFFF;
+    }
+
+    /* Keyboard focus ring simulation for active/focused elements */
+    .dark-theme-wrapper button.sidebar-nav-item:focus-visible,
+    .dark-theme-wrapper button.sidebar-nav-item.focus-ring-active {
+      outline: 2px solid rgba(255, 255, 255, 0.4);
+      outline-offset: 1px;
+    }
+
+    .dark-theme-wrapper .bottom-queue-group {
+      border-top-color: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Dark Workspace Header Controls */
+    .dark-theme-wrapper .workspace-header-card {
+      background-color: #161718;
+      border-color: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .dark-theme-wrapper .header-col-divider {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .dark-theme-wrapper .control-group-title {
+      color: #D1D5DB;
+    }
+    .dark-theme-wrapper .control-group-title svg {
+      stroke: #9CA3AF;
+    }
+
+    .dark-theme-wrapper .refresh-btn {
+      color: #9CA3AF;
+    }
+    .dark-theme-wrapper .refresh-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .dark-theme-wrapper .refresh-btn svg {
+      stroke: currentColor;
+    }
+
+    .dark-theme-wrapper .voice-selector-box {
+      background: #1B1C1E;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #F3F4F6;
+    }
+    .dark-theme-wrapper .voice-selector-box:hover {
+      background: #202124;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .dark-theme-wrapper .voice-pulse-dot {
+      background: #A1A7B2;
+      box-shadow: 0 0 8px rgba(161, 167, 178, 0.4);
+    }
+    .dark-theme-wrapper .voice-tag {
+      background: rgba(255, 255, 255, 0.08);
+      color: #D1D5DB;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dark-theme-wrapper .chevron-icon {
+      stroke: #A6ACB5;
+    }
+
+    /* Dark Sliders: WebKit & Firefox Run Track & Thumb (Zero Blue) */
+    .dark-theme-wrapper .app-slider::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(to right, #6B7280 0%, #6B7280 var(--slider-pct, 50%), #2D3035 var(--slider-pct, 50%), #2D3035 100%);
+    }
+    .dark-theme-wrapper .app-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #F3F4F6;
+      border: 2px solid #1E2023;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      margin-top: -5.5px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .dark-theme-wrapper .app-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16), 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+    .dark-theme-wrapper .app-slider::-moz-range-track {
+      height: 4px;
+      border-radius: 2px;
+      background: #2D3035;
+    }
+    .dark-theme-wrapper .app-slider::-moz-range-progress {
+      height: 4px;
+      border-radius: 2px;
+      background: #6B7280;
+    }
+    .dark-theme-wrapper .app-slider::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #F3F4F6;
+      border: 2px solid #1E2023;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .dark-theme-wrapper .slider-label {
+      color: #D1D5DB;
+    }
+    .dark-theme-wrapper .slider-val-badge {
+      color: #A1A7B2;
+    }
+    .dark-theme-wrapper .slider-reset-btn svg {
+      stroke: #A1A7B2;
+    }
+
+    /* Dark Main Text Canvas */
+    .dark-theme-wrapper .workspace-canvas-card {
+      background-color: #151617;
+      border-color: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .dark-theme-wrapper .canvas-textarea {
+      color: #F3F4F6;
+    }
+    .dark-theme-wrapper .canvas-textarea::placeholder {
+      color: #555B64;
+    }
+
+    .dark-theme-wrapper .canvas-footer {
+      background: rgba(25, 26, 27, 0.88);
+      border-color: rgba(255, 255, 255, 0.09);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .dark-theme-wrapper .counter-text {
+      color: #9CA3AF;
+    }
+    .dark-theme-wrapper .canvas-clear-btn svg {
+      stroke: #EF4444;
+    }
+
+    /* ==========================================================================
+       THEME 2: REFINED LIGHT THEME (VS CODE 2026 DEFAULT LIGHT STANDARD)
+       High-visibility, strict contrast, sharp boundaries, zero blurriness.
+       ========================================================================== */
+    .light-theme-wrapper .desktop-window {
+      background-color: #F3F3F5; /* Crisp modern flat studio canvas */
+      border: 1px solid #D8DADC;
+      box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      color: #1A1D20;
+    }
+
+    .light-theme-wrapper .app-titlebar {
+      background: #EBECEF;
+      border-bottom-color: #D8DADC;
+    }
+    .light-theme-wrapper .titlebar-text {
+      color: #374151;
+      font-weight: 600;
+    }
+    .light-theme-wrapper .window-controls-btn.close { background: #E05252; opacity: 0.85; }
+    .light-theme-wrapper .window-controls-btn.min { background: #E5A84B; opacity: 0.85; }
+    .light-theme-wrapper .window-controls-btn.max { background: #4BB368; opacity: 0.85; }
+
+    /* Light Sidebar: Distinct, crisp modern boundary */
+    .light-theme-wrapper .app-sidebar {
+      background-color: #F8F9FA;
+      border-right-color: #DDE0E5;
+    }
+
+    .light-theme-wrapper .branding-logo-box {
+      background: #FFFFFF;
+      border: 1px solid #D5D9DF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 #FFFFFF;
+    }
+
+    .light-theme-wrapper .branding-app-name {
+      color: #111827;
+      font-weight: 700;
+    }
+    .light-theme-wrapper .branding-subtitle {
+      color: #4B5563;
+      font-weight: 500;
+      opacity: 0.85;
+    }
+
+    /* Inactive nav buttons in Light Theme */
+    .light-theme-wrapper button.sidebar-nav-item {
+      color: #374151; /* High contrast sharp text */
+      background: transparent;
+      border-color: transparent;
+    }
+    .light-theme-wrapper button.sidebar-nav-item svg {
+      stroke: #374151;
+    }
+
+    .light-theme-wrapper button.sidebar-nav-item:hover {
+      color: #111827;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .light-theme-wrapper button.sidebar-nav-item:hover svg {
+      stroke: #111827;
+    }
+
+    /* Light Theme ACTIVE State: Refined semi-transparent morphic glaze overlay */
+    .light-theme-wrapper button.sidebar-nav-item.active {
+      color: #0F172A;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    .light-theme-wrapper button.sidebar-nav-item.active svg {
+      stroke: #0F172A;
+    }
+
+    .light-theme-wrapper button.sidebar-nav-item:focus-visible,
+    .light-theme-wrapper button.sidebar-nav-item.focus-ring-active {
+      outline: 2px solid rgba(0, 0, 0, 0.4);
+      outline-offset: 1px;
+    }
+
+    .light-theme-wrapper .bottom-queue-group {
+      border-top-color: #E2E5E9;
+    }
+
+    /* Light Workspace Header Controls */
+    .light-theme-wrapper .workspace-header-card {
+      background-color: #FFFFFF;
+      border-color: #DDE0E5;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .light-theme-wrapper .header-col-divider {
+      background-color: #E2E5E9;
+    }
+
+    .light-theme-wrapper .control-group-title {
+      color: #1F2937;
+    }
+    .light-theme-wrapper .control-group-title svg {
+      stroke: #374151;
+    }
+
+    .light-theme-wrapper .refresh-btn {
+      color: #4B5563;
+    }
+    .light-theme-wrapper .refresh-btn:hover {
+      color: #111827;
+      background: #F3F4F6;
+    }
+    .light-theme-wrapper .refresh-btn svg {
+      stroke: currentColor;
+    }
+
+    .light-theme-wrapper .voice-selector-box {
+      background: #F8F9FA;
+      border-color: #D5D9DF;
+      color: #111827;
+    }
+    .light-theme-wrapper .voice-selector-box:hover {
+      background: #F0F2F5;
+      border-color: #BFC5CE;
+    }
+    .light-theme-wrapper .voice-pulse-dot {
+      background: #475569;
+      box-shadow: 0 0 6px rgba(71, 85, 105, 0.3);
+    }
+    .light-theme-wrapper .voice-tag {
+      background: #E5E7EB;
+      color: #1F2937;
+      border: 1px solid #D1D5DB;
+    }
+    .light-theme-wrapper .chevron-icon {
+      stroke: #374151;
+    }
+
+    /* Light Sliders: WebKit & Firefox Run Track & Thumb (Zero Blue) */
+    .light-theme-wrapper .app-slider::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(to right, #4B5563 0%, #4B5563 var(--slider-pct, 50%), #D1D5DB var(--slider-pct, 50%), #D1D5DB 100%);
+    }
+    .light-theme-wrapper .app-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      margin-top: -5.5px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .light-theme-wrapper .app-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.15), 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .light-theme-wrapper .app-slider::-moz-range-track {
+      height: 4px;
+      border-radius: 2px;
+      background: #D1D5DB;
+    }
+    .light-theme-wrapper .app-slider::-moz-range-progress {
+      height: 4px;
+      border-radius: 2px;
+      background: #4B5563;
+    }
+    .light-theme-wrapper .app-slider::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .light-theme-wrapper .slider-label {
+      color: #1F2937;
+    }
+    .light-theme-wrapper .slider-val-badge {
+      color: #374151;
+    }
+    .light-theme-wrapper .slider-reset-btn svg {
+      stroke: #4B5563;
+    }
+
+    /* Light Main Text Canvas */
+    .light-theme-wrapper .workspace-canvas-card {
+      background-color: #FFFFFF;
+      border-color: #DDE0E5;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .light-theme-wrapper .canvas-textarea {
+      color: #111827; /* High contrast, deep crisp black text */
+    }
+    .light-theme-wrapper .canvas-textarea::placeholder {
+      color: #8C94A0;
+    }
+
+    .light-theme-wrapper .canvas-footer {
+      background: rgba(248, 249, 250, 0.94);
+      border-color: #D1D5DB;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    .light-theme-wrapper .counter-text {
+      color: #374151;
+      font-weight: 600;
+    }
+    .light-theme-wrapper .canvas-clear-btn svg {
+      stroke: #DC2626;
+    }
+
+    /* ==========================================================================
+       FLYOUT DROPDOWN SIMULATOR (VOICE PICKER)
+       ========================================================================== */
+    .voice-flyout-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 6px;
+      border-radius: 9px;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      padding: 6px;
+      gap: 2px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .voice-flyout-menu.open {
+      display: flex;
+    }
+
+    .dark-theme-wrapper .voice-flyout-menu {
+      background: #1C1D1F;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .light-theme-wrapper .voice-flyout-menu {
+      background: #FFFFFF;
+      border: 1px solid #D5D9DF;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .voice-option-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    .dark-theme-wrapper .voice-option-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .dark-theme-wrapper .voice-option-item.selected {
+      background: rgba(255, 255, 255, 0.09);
+      color: #FFF;
+      font-weight: 600;
+    }
+
+    .light-theme-wrapper .voice-option-item:hover {
+      background: #F3F4F6;
+    }
+    .light-theme-wrapper .voice-option-item.selected {
+      background: #E5E7EB;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    /* Modal / Drawer for XAML Design Tokens */
+    .tokens-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .tokens-modal-backdrop.open {
+      display: flex;
+    }
+
+    .tokens-modal {
+      background: #161718;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      max-width: 820px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75);
+    }
+
+    .tokens-modal-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tokens-modal-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #F3F4F6;
+    }
+
+    .tokens-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #D1D5DB;
+    }
+
+    .tokens-modal-body pre {
+      background: #0E0F10;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--mono-font);
+      font-size: 12px;
+      color: #A5B4FC;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       MOCKUP PRESENTATION CONTROLS BAR
+       ======================================================================== -->
+  <header class="viewer-header">
+    <div class="viewer-title-group">
+      <div class="viewer-badge live">Desktop Mockup 2026</div>
+      <h1 class="viewer-title">Narraz (नराज़) Studio <span>Text-to-Speech Desktop UI Architecture</span></h1>
+    </div>
+
+    <div class="viewer-controls">
+      <div class="view-segmented-control" role="tablist">
+        <button id="viewSideBySide" class="view-btn active" onclick="setViewMode('split')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="18" rx="2"/><rect x="13" y="3" width="8" height="18" rx="2"/></svg>
+          Side-by-Side (तुलना)
+        </button>
+        <button id="viewDarkOnly" class="view-btn" onclick="setViewMode('dark')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Deep Black Dark (#121314)
+        </button>
+        <button id="viewLightOnly" class="view-btn" onclick="setViewMode('light')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          Refined Light Theme
+        </button>
+      </div>
+
+      <button class="action-btn" onclick="toggleFocusRingDemo()" title="Toggle simulated keyboard focus ring state">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        फोकस रिंग सिमुलेशन
+      </button>
+
+      <button class="action-btn" onclick="injectHindiSampleText()" title="Populate realistic Hindi TTS narration script into both canvas fields">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        हिंदी नमूना टेक्स्ट
+      </button>
+
+      <button class="action-btn primary" onclick="openTokensModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        XAML टोकन और कोड
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       PRESENTATION STAGE: SIDE-BY-SIDE PANELS
+       ======================================================================== -->
+  <main class="presentation-stage">
+    <div id="mockupsGrid" class="mockups-grid">
+
+      <!-- ====================================================================
+           THEME 1: DEEP BLACK DARK THEME PANEL
+           ==================================================================== -->
+      <section class="theme-container dark-theme-wrapper" aria-label="Deep Black Dark Theme Mockup">
+        <div class="theme-header-bar">
+          <div class="theme-header-title">
+            <span class="theme-chip dark">VS Code 2026 Dark Standard</span>
+            Deep Black Dark Theme
+          </div>
+          <div class="theme-spec-pills">
+            <span class="spec-pill">Canvas: #121314</span>
+            <span class="spec-pill">Sidebar: #191A1B</span>
+            <span class="spec-pill">Morphic Glaze Highlight</span>
+          </div>
+        </div>
+
+        <div class="desktop-window" id="darkAppWindow">
+          <!-- Window Title Bar -->
+          <div class="app-titlebar">
+            <div class="titlebar-left">
+              <img src="AppIcon.png" alt="Narraz Icon" class="titlebar-icon">
+              <span class="titlebar-text">Narraz (नराज़)</span>
+            </div>
+            <div class="titlebar-right">
+              <span class="window-controls-btn min"></span>
+              <span class="window-controls-btn max"></span>
+              <span class="window-controls-btn close"></span>
+            </div>
+          </div>
+
+          <!-- Application Window Body -->
+          <div class="app-body">
+            
+            <!-- ===== LEFT SIDEBAR ===== -->
+            <aside class="app-sidebar">
+              <!-- Top Branding Group: Generous Vertical Gap Cushion -->
+              <div class="branding-group">
+                <div class="branding-logo-box">
+                  <img src="AppIcon.png" alt="Narraz Logo">
+                </div>
+                <h2 class="branding-app-name">Narraz (नराज़)</h2>
+                <p class="branding-subtitle">टेक्स्ट-टू-स्पीच स्टूडियो</p>
+              </div>
+
+              <!-- Middle Action Options Group -->
+              <div class="sidebar-group-container middle-actions-group">
+                <div class="group-section-label">मुख्य विकल्प</div>
+                
+                <!-- Option 1: बैच टेक्स्ट (Batch Text) - Active State with Morphic Glaze -->
+                <button class="sidebar-nav-item active" id="dark-opt-batch" onclick="selectNavOption('dark', this)" aria-selected="true">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  </span>
+                  <span class="nav-label">बैच टेक्स्ट</span>
+                </button>
+
+                <!-- Option 2: सेव की गई आवाजें (Saved Voices) -->
+                <button class="sidebar-nav-item" id="dark-opt-saved" onclick="selectNavOption('dark', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="10" y1="10" x2="14" y2="10"/></svg>
+                  </span>
+                  <span class="nav-label">सेव की गई आवाजें</span>
+                </button>
+
+                <!-- Option 3: ऐप सेटिंग्स (App Settings) -->
+                <button class="sidebar-nav-item" id="dark-opt-settings" onclick="selectNavOption('dark', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </span>
+                  <span class="nav-label">ऐप सेटिंग्स</span>
+                </button>
+              </div>
+
+              <!-- Flexible Spacer to ensure bottom group anchors perfectly -->
+              <div class="sidebar-spacer"></div>
+
+              <!-- Bottom Queue Options Group -->
+              <div class="sidebar-group-container bottom-queue-group">
+                <div class="group-section-label">कतार एवं निर्यात</div>
+
+                <!-- Option 1: वीडियो कतार (Video Queue) -->
+                <button class="sidebar-nav-item" id="dark-opt-queue" onclick="selectNavOption('dark', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><line x1="5" y1="10" x2="11" y2="10"/><line x1="5" y1="14" x2="9" y2="14"/></svg>
+                  </span>
+                  <span class="nav-label">वीडियो कतार</span>
+                </button>
+
+                <!-- Option 2: MP3 में सेव करें (Save to MP3) -->
+                <button class="sidebar-nav-item" id="dark-opt-mp3" onclick="selectNavOption('dark', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M12 9l-3 3 3 3"/></svg>
+                  </span>
+                  <span class="nav-label">MP3 में सेव करें</span>
+                </button>
+              </div>
+            </aside>
+
+            <!-- ===== MAIN WORKSPACE AREA ===== -->
+            <main class="app-workspace">
+              
+              <!-- Header Controls: Voice Selection + Rate & Pitch Sliders -->
+              <div class="workspace-header-card">
+                <!-- Left Section: Voice Selection -->
+                <div class="header-col-left">
+                  <div class="control-group-title-row">
+                    <div class="control-group-title">
+                      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                      नैरेटर सेटिंग्स
+                    </div>
+                    <button class="refresh-btn" onclick="triggerRefreshAnimation(this)" title="आवाजें रीफ़्रेश करें">
+                      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="voice-selector-box" onclick="toggleVoiceFlyout('dark')" tabindex="0" role="combobox" aria-expanded="false">
+                    <div class="voice-selected-content">
+                      <span class="voice-pulse-dot"></span>
+                      <span class="voice-name-text" id="darkSelectedVoiceText">Microsoft Madhur Online (Natural) - Hindi (India)</span>
+                      <span class="voice-tag">Natural</span>
+                    </div>
+                    <svg class="chevron-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+
+                    <!-- Interactive Flyout Dropdown -->
+                    <div class="voice-flyout-menu" id="darkVoiceFlyout">
+                      <div class="voice-option-item selected" onclick="pickVoice('dark', 'Microsoft Madhur Online (Natural) - Hindi (India)')">
+                        <span>Microsoft Madhur Online (Natural) - Hindi (India)</span>
+                        <span class="voice-tag">Natural Male</span>
+                      </div>
+                      <div class="voice-option-item" onclick="pickVoice('dark', 'Microsoft Swara Online (Natural) - Hindi (India)')">
+                        <span>Microsoft Swara Online (Natural) - Hindi (India)</span>
+                        <span class="voice-tag">Natural Female</span>
+                      </div>
+                      <div class="voice-option-item" onclick="pickVoice('dark', 'Google Hindi (Neural2) - hi-IN-Wavenet-B')">
+                        <span>Google Hindi Neural2 - Hindi (India)</span>
+                        <span class="voice-tag">Neural</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Vertical Divider -->
+                <div class="header-col-divider"></div>
+
+                <!-- Right Section: Rate & Pitch Sliders -->
+                <div class="header-col-right">
+                  <div class="control-group-title-row">
+                    <div class="control-group-title">
+                      <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                      आवाज़ सेटिंग्स
+                    </div>
+                  </div>
+
+                  <div class="sliders-container">
+                    <!-- Rate Slider -->
+                    <div class="slider-row">
+                      <span class="slider-label">गति (Rate)</span>
+                      <div class="slider-control-wrap">
+                        <input type="range" min="-50" max="50" value="0" class="app-slider" id="darkRateSlider" oninput="updateSlider('dark', 'rate', this.value)" style="--slider-pct: 50%;">
+                      </div>
+                      <span class="slider-val-badge" id="darkRateVal">0%</span>
+                      <button class="slider-reset-btn" onclick="resetSlider('dark', 'rate')" title="गति रीसेट करें">
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      </button>
+                    </div>
+
+                    <!-- Pitch Slider -->
+                    <div class="slider-row">
+                      <span class="slider-label">पिच (Pitch)</span>
+                      <div class="slider-control-wrap">
+                        <input type="range" min="-20" max="20" value="0" class="app-slider" id="darkPitchSlider" oninput="updateSlider('dark', 'pitch', this.value)" style="--slider-pct: 50%;">
+                      </div>
+                      <span class="slider-val-badge" id="darkPitchVal">0 Hz</span>
+                      <button class="slider-reset-btn" onclick="resetSlider('dark', 'pitch')" title="पिच रीसेट करें">
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Text Canvas -->
+              <div class="workspace-canvas-card">
+                <textarea 
+                  class="canvas-textarea" 
+                  id="darkTextInput" 
+                  placeholder="टाइप करें, पेस्ट करें, या फ़ाइलें यहाँ खींचकर छोड़ें..." 
+                  oninput="handleTextInput('dark', this.value)"
+                  spellcheck="false"></textarea>
+
+                <!-- Canvas Bottom-Right Counter & Clear -->
+                <div class="canvas-footer">
+                  <span class="counter-text" id="darkCountBadge">0 Words • 0 Characters</span>
+                  <button class="canvas-clear-btn" onclick="clearCanvasText('dark')" title="टेक्स्ट साफ़ करें">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </button>
+                </div>
+              </div>
+
+            </main>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           THEME 2: REFINED LIGHT THEME PANEL
+           ==================================================================== -->
+      <section class="theme-container light-theme-wrapper" aria-label="Refined Light Theme Mockup">
+        <div class="theme-header-bar">
+          <div class="theme-header-title">
+            <span class="theme-chip light">VS Code 2026 Light Standard</span>
+            Refined Light Theme
+          </div>
+          <div class="theme-spec-pills">
+            <span class="spec-pill">Canvas: #F3F3F5</span>
+            <span class="spec-pill">Sidebar: #F8F9FA</span>
+            <span class="spec-pill">High Contrast Borders</span>
+          </div>
+        </div>
+
+        <div class="desktop-window" id="lightAppWindow">
+          <!-- Window Title Bar -->
+          <div class="app-titlebar">
+            <div class="titlebar-left">
+              <img src="AppIcon.png" alt="Narraz Icon" class="titlebar-icon">
+              <span class="titlebar-text">Narraz (नराज़)</span>
+            </div>
+            <div class="titlebar-right">
+              <span class="window-controls-btn min"></span>
+              <span class="window-controls-btn max"></span>
+              <span class="window-controls-btn close"></span>
+            </div>
+          </div>
+
+          <!-- Application Window Body -->
+          <div class="app-body">
+            
+            <!-- ===== LEFT SIDEBAR ===== -->
+            <aside class="app-sidebar">
+              <!-- Top Branding Group: Generous Vertical Gap Cushion -->
+              <div class="branding-group">
+                <div class="branding-logo-box">
+                  <img src="AppIcon.png" alt="Narraz Logo">
+                </div>
+                <h2 class="branding-app-name">Narraz (नराज़)</h2>
+                <p class="branding-subtitle">टेक्स्ट-टू-स्पीच स्टूडियो</p>
+              </div>
+
+              <!-- Middle Action Options Group -->
+              <div class="sidebar-group-container middle-actions-group">
+                <div class="group-section-label">मुख्य विकल्प</div>
+
+                <!-- Option 1: बैच टेक्स्ट (Batch Text) - Active State -->
+                <button class="sidebar-nav-item active" id="light-opt-batch" onclick="selectNavOption('light', this)" aria-selected="true">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  </span>
+                  <span class="nav-label">बैच टेक्स्ट</span>
+                </button>
+
+                <!-- Option 2: सेव की गई आवाजें (Saved Voices) -->
+                <button class="sidebar-nav-item" id="light-opt-saved" onclick="selectNavOption('light', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="10" y1="10" x2="14" y2="10"/></svg>
+                  </span>
+                  <span class="nav-label">सेव की गई आवाजें</span>
+                </button>
+
+                <!-- Option 3: ऐप सेटिंग्स (App Settings) -->
+                <button class="sidebar-nav-item" id="light-opt-settings" onclick="selectNavOption('light', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </span>
+                  <span class="nav-label">ऐप सेटिंग्स</span>
+                </button>
+              </div>
+
+              <!-- Flexible Spacer to ensure bottom group anchors perfectly -->
+              <div class="sidebar-spacer"></div>
+
+              <!-- Bottom Queue Options Group -->
+              <div class="sidebar-group-container bottom-queue-group">
+                <div class="group-section-label">कतार एवं निर्यात</div>
+
+                <!-- Option 1: वीडियो कतार (Video Queue) -->
+                <button class="sidebar-nav-item" id="light-opt-queue" onclick="selectNavOption('light', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><line x1="5" y1="10" x2="11" y2="10"/><line x1="5" y1="14" x2="9" y2="14"/></svg>
+                  </span>
+                  <span class="nav-label">वीडियो कतार</span>
+                </button>
+
+                <!-- Option 2: MP3 में सेव करें (Save to MP3) -->
+                <button class="sidebar-nav-item" id="light-opt-mp3" onclick="selectNavOption('light', this)" aria-selected="false">
+                  <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M12 9l-3 3 3 3"/></svg>
+                  </span>
+                  <span class="nav-label">MP3 में सेव करें</span>
+                </button>
+              </div>
+            </aside>
+
+            <!-- ===== MAIN WORKSPACE AREA ===== -->
+            <main class="app-workspace">
+              
+              <!-- Header Controls: Voice Selection + Rate & Pitch Sliders -->
+              <div class="workspace-header-card">
+                <!-- Left Section: Voice Selection -->
+                <div class="header-col-left">
+                  <div class="control-group-title-row">
+                    <div class="control-group-title">
+                      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                      नैरेटर सेटिंग्स
+                    </div>
+                    <button class="refresh-btn" onclick="triggerRefreshAnimation(this)" title="आवाजें रीफ़्रेश करें">
+                      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="voice-selector-box" onclick="toggleVoiceFlyout('light')" tabindex="0" role="combobox" aria-expanded="false">
+                    <div class="voice-selected-content">
+                      <span class="voice-pulse-dot"></span>
+                      <span class="voice-name-text" id="lightSelectedVoiceText">Microsoft Madhur Online (Natural) - Hindi (India)</span>
+                      <span class="voice-tag">Natural</span>
+                    </div>
+                    <svg class="chevron-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+
+                    <!-- Interactive Flyout Dropdown -->
+                    <div class="voice-flyout-menu" id="lightVoiceFlyout">
+                      <div class="voice-option-item selected" onclick="pickVoice('light', 'Microsoft Madhur Online (Natural) - Hindi (India)')">
+                        <span>Microsoft Madhur Online (Natural) - Hindi (India)</span>
+                        <span class="voice-tag">Natural Male</span>
+                      </div>
+                      <div class="voice-option-item" onclick="pickVoice('light', 'Microsoft Swara Online (Natural) - Hindi (India)')">
+                        <span>Microsoft Swara Online (Natural) - Hindi (India)</span>
+                        <span class="voice-tag">Natural Female</span>
+                      </div>
+                      <div class="voice-option-item" onclick="pickVoice('light', 'Google Hindi (Neural2) - hi-IN-Wavenet-B')">
+                        <span>Google Hindi Neural2 - Hindi (India)</span>
+                        <span class="voice-tag">Neural</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Vertical Divider -->
+                <div class="header-col-divider"></div>
+
+                <!-- Right Section: Rate & Pitch Sliders -->
+                <div class="header-col-right">
+                  <div class="control-group-title-row">
+                    <div class="control-group-title">
+                      <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                      आवाज़ सेटिंग्स
+                    </div>
+                  </div>
+
+                  <div class="sliders-container">
+                    <!-- Rate Slider -->
+                    <div class="slider-row">
+                      <span class="slider-label">गति (Rate)</span>
+                      <div class="slider-control-wrap">
+                        <input type="range" min="-50" max="50" value="0" class="app-slider" id="lightRateSlider" oninput="updateSlider('light', 'rate', this.value)" style="--slider-pct: 50%;">
+                      </div>
+                      <span class="slider-val-badge" id="lightRateVal">0%</span>
+                      <button class="slider-reset-btn" onclick="resetSlider('light', 'rate')" title="गति रीसेट करें">
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      </button>
+                    </div>
+
+                    <!-- Pitch Slider -->
+                    <div class="slider-row">
+                      <span class="slider-label">पिच (Pitch)</span>
+                      <div class="slider-control-wrap">
+                        <input type="range" min="-20" max="20" value="0" class="app-slider" id="lightPitchSlider" oninput="updateSlider('light', 'pitch', this.value)" style="--slider-pct: 50%;">
+                      </div>
+                      <span class="slider-val-badge" id="lightPitchVal">0 Hz</span>
+                      <button class="slider-reset-btn" onclick="resetSlider('light', 'pitch')" title="पिच रीसेट करें">
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Text Canvas -->
+              <div class="workspace-canvas-card">
+                <textarea 
+                  class="canvas-textarea" 
+                  id="lightTextInput" 
+                  placeholder="टाइप करें, पेस्ट करें, या फ़ाइलें यहाँ खींचकर छोड़ें..." 
+                  oninput="handleTextInput('light', this.value)"
+                  spellcheck="false"></textarea>
+
+                <!-- Canvas Bottom-Right Counter & Clear -->
+                <div class="canvas-footer">
+                  <span class="counter-text" id="lightCountBadge">0 Words • 0 Characters</span>
+                  <button class="canvas-clear-btn" onclick="clearCanvasText('light')" title="टेक्स्ट साफ़ करें">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </button>
+                </div>
+              </div>
+
+            </main>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       MODAL: XAML COLOR TOKENS & DESIGN SYSTEM CODE SPECIFICATION
+       ======================================================================== -->
+  <div class="tokens-modal-backdrop" id="tokensModal" onclick="if(event.target===this) closeTokensModal()">
+    <div class="tokens-modal" role="dialog" aria-modal="true" aria-labelledby="tokensModalTitle">
+      <div class="tokens-modal-header">
+        <h3 id="tokensModalTitle">WPF XAML Design System Tokens for NarrazStudio</h3>
+        <button class="action-btn" onclick="closeTokensModal()">बंद करें (Esc)</button>
+      </div>
+      <div class="tokens-modal-body">
+        <p>This design specification translates directly into <code>MainWindow.xaml</code> and <code>App.xaml</code> resources to replace the previous high-contrast blue accents with the modern Visual Studio Code 2026 frosted-glass and low-contrast flat aesthetic.</p>
+
+        <h4 style="margin-top:16px; color:#F3F4F6;">1. Theme 1 (Deep Black) Color Tokens</h4>
+        <pre><code>&lt;!-- Deep Black Palette (#121314 &amp; #191A1B) --&gt;
+&lt;SolidColorBrush x:Key="AppCanvasBackgroundDark" Color="#121314"/&gt;
+&lt;SolidColorBrush x:Key="SidebarBackgroundDark" Color="#191A1B"/&gt;
+&lt;SolidColorBrush x:Key="CardBackgroundDark" Color="#161718"/&gt;
+&lt;SolidColorBrush x:Key="CardBorderDark" Color="#222426"/&gt;
+&lt;SolidColorBrush x:Key="SliderTrackDark" Color="#2D3035"/&gt;
+&lt;SolidColorBrush x:Key="SliderFilledDark" Color="#6B7280"/&gt; &lt;!-- Monochromatic, NO bright blue --&gt;
+&lt;SolidColorBrush x:Key="SliderThumbDark" Color="#F3F4F6"/&gt;
+
+&lt;!-- Morphic Glaze Selected Overlay (Active State) --&gt;
+&lt;SolidColorBrush x:Key="MorphicGlazeDarkFill" Color="#14FFFFFF"/&gt; &lt;!-- 8% white --&gt;
+&lt;SolidColorBrush x:Key="MorphicGlazeDarkBorder" Color="#24FFFFFF"/&gt; &lt;!-- 14% white --&gt;</code></pre>
+
+        <h4 style="margin-top:16px; color:#F3F4F6;">2. Theme 2 (Refined Light) Color Tokens</h4>
+        <pre><code>&lt;!-- Refined Light Palette (VS Code 2026 Light) --&gt;
+&lt;SolidColorBrush x:Key="AppCanvasBackgroundLight" Color="#F3F3F5"/&gt;
+&lt;SolidColorBrush x:Key="SidebarBackgroundLight" Color="#F8F9FA"/&gt;
+&lt;SolidColorBrush x:Key="CardBackgroundLight" Color="#FFFFFF"/&gt;
+&lt;SolidColorBrush x:Key="CardBorderLight" Color="#DDE0E5"/&gt;
+&lt;SolidColorBrush x:Key="SliderTrackLight" Color="#D1D5DB"/&gt;
+&lt;SolidColorBrush x:Key="SliderFilledLight" Color="#4B5563"/&gt; &lt;!-- Refined Slate --&gt;
+&lt;SolidColorBrush x:Key="SliderThumbLight" Color="#111827"/&gt;
+
+&lt;!-- Morphic Glaze Selected Overlay (Active State) --&gt;
+&lt;SolidColorBrush x:Key="MorphicGlazeLightFill" Color="#0F000000"/&gt; &lt;!-- 6% black --&gt;
+&lt;SolidColorBrush x:Key="MorphicGlazeLightBorder" Color="#1F000000"/&gt; &lt;!-- 12% black --&gt;</code></pre>
+
+        <h4 style="margin-top:16px; color:#F3F4F6;">3. Left Sidebar Hierarchy Skeleton</h4>
+        <pre><code>&lt;!-- Hierarchy in MainWindow.xaml --&gt;
+&lt;Grid Width="275" Background="{ThemeResource SidebarBackground}"&gt;
+  &lt;Grid.RowDefinitions&gt;
+    &lt;RowDefinition Height="Auto"/&gt; &lt;!-- 1. Top Branding Group --&gt;
+    &lt;RowDefinition Height="Auto"/&gt; &lt;!-- 2. Middle Action Options Group --&gt;
+    &lt;RowDefinition Height="*"/&gt;    &lt;!-- Whitespace Cushion / Spacer --&gt;
+    &lt;RowDefinition Height="Auto"/&gt; &lt;!-- 3. Bottom Queue Options Group --&gt;
+  &lt;/Grid.RowDefinitions&gt;
+
+  &lt;!-- Top Branding with generous cushion --&gt;
+  &lt;StackPanel Grid.Row="0" Margin="0,22,0,34" HorizontalAlignment="Center"&gt;
+    &lt;Image Source="Assets/AppIcon.png" Width="48" Height="48"/&gt;
+    &lt;TextBlock Text="Narraz (नराज़)" FontWeight="Bold" FontSize="16"/&gt;
+  &lt;/StackPanel&gt;
+
+  &lt;!-- Middle Action Options Group --&gt;
+  &lt;StackPanel Grid.Row="1" Spacing="4" Margin="14,0,14,0"&gt;
+    &lt;Button Content="बैच टेक्स्ट" Style="{StaticResource MorphicGlazeItemStyle}"/&gt;
+    &lt;Button Content="सेव की गई आवाजें" Style="{StaticResource SidebarItemStyle}"/&gt;
+    &lt;Button Content="ऐप सेटिंग्स" Style="{StaticResource SidebarItemStyle}"/&gt;
+  &lt;/StackPanel&gt;
+
+  &lt;!-- Bottom Queue Options Group --&gt;
+  &lt;StackPanel Grid.Row="3" Spacing="4" Margin="14,0,14,18"&gt;
+    &lt;Button Content="वीडियो कतार" Style="{StaticResource SidebarItemStyle}"/&gt;
+    &lt;Button Content="MP3 में सेव करें" Style="{StaticResource SidebarItemStyle}"/&gt;
+  &lt;/StackPanel&gt;
+&lt;/Grid&gt;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       INTERACTIVE LOGIC: SLIDERS, INPUT SYNCHRONIZATION & THEME CONTROLS
+       ======================================================================== -->
+  <script>
+    // State management
+    const state = {
+      dark: { rate: 0, pitch: 0, voice: "Microsoft Madhur Online (Natural) - Hindi (India)" },
+      light: { rate: 0, pitch: 0, voice: "Microsoft Madhur Online (Natural) - Hindi (India)" }
+    };
+
+    // View switcher mode: 'split', 'dark', 'light'
+    function setViewMode(mode) {
+      const grid = document.getElementById('mockupsGrid');
+      const btnSplit = document.getElementById('viewSideBySide');
+      const btnDark = document.getElementById('viewDarkOnly');
+      const btnLight = document.getElementById('viewLightOnly');
+
+      grid.className = 'mockups-grid';
+      [btnSplit, btnDark, btnLight].forEach(b => b.classList.remove('active'));
+
+      if (mode === 'dark') {
+        grid.classList.add('single-dark');
+        btnDark.classList.add('active');
+      } else if (mode === 'light') {
+        grid.classList.add('single-light');
+        btnLight.classList.add('active');
+      } else {
+        btnSplit.classList.add('active');
+      }
+    }
+
+    // Nav option selection within sidebar
+    function selectNavOption(theme, btnElement) {
+      const parentGroup = btnElement.closest('.app-sidebar');
+      const allButtons = parentGroup.querySelectorAll('.sidebar-nav-item');
+      allButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      btnElement.classList.add('active');
+      btnElement.setAttribute('aria-selected', 'true');
+    }
+
+    // Sliders handling with custom percentage background fill (monochromatic)
+    function updateSlider(theme, type, val) {
+      state[theme][type] = val;
+      const slider = document.getElementById(`${theme}${type === 'rate' ? 'Rate' : 'Pitch'}Slider`);
+      const valBadge = document.getElementById(`${theme}${type === 'rate' ? 'Rate' : 'Pitch'}Val`);
+
+      const min = parseFloat(slider.min);
+      const max = parseFloat(slider.max);
+      const pct = ((val - min) / (max - min)) * 100;
+      slider.style.setProperty('--slider-pct', `${pct}%`);
+
+      if (type === 'rate') {
+        valBadge.textContent = `${val > 0 ? '+' : ''}${val}%`;
+      } else {
+        valBadge.textContent = `${val > 0 ? '+' : ''}${val} Hz`;
+      }
+    }
+
+    function resetSlider(theme, type) {
+      const slider = document.getElementById(`${theme}${type === 'rate' ? 'Rate' : 'Pitch'}Slider`);
+      slider.value = 0;
+      updateSlider(theme, type, 0);
+    }
+
+    // Voice Flyout Dropdown
+    function toggleVoiceFlyout(theme) {
+      const flyout = document.getElementById(`${theme}VoiceFlyout`);
+      const isOpen = flyout.classList.contains('open');
+      document.querySelectorAll('.voice-flyout-menu').forEach(f => f.classList.remove('open'));
+      if (!isOpen) {
+        flyout.classList.add('open');
+      }
+    }
+
+    function pickVoice(theme, voiceName) {
+      state[theme].voice = voiceName;
+      document.getElementById(`${theme}SelectedVoiceText`).textContent = voiceName;
+      
+      const flyout = document.getElementById(`${theme}VoiceFlyout`);
+      flyout.querySelectorAll('.voice-option-item').forEach(item => {
+        if (item.innerText.includes(voiceName)) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+      flyout.classList.remove('open');
+    }
+
+    // Close flyout on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.voice-selector-box')) {
+        document.querySelectorAll('.voice-flyout-menu').forEach(f => f.classList.remove('open'));
+      }
+    });
+
+    // Text & Character Counter
+    function handleTextInput(theme, text) {
+      const trimmed = text.trim();
+      const words = trimmed.length === 0 ? 0 : trimmed.split(/\s+/).length;
+      const chars = text.length;
+      const counterText = `${words} Words • ${chars} Characters`;
+      document.getElementById(`${theme}CountBadge`).textContent = counterText;
+    }
+
+    function clearCanvasText(theme) {
+      const area = document.getElementById(`${theme}TextInput`);
+      area.value = '';
+      handleTextInput(theme, '');
+      area.focus();
+    }
+
+    // Sample Hindi text injection for realistic evaluation
+    function injectHindiSampleText() {
+      const sample = "नमस्ते! Narraz स्टूडियो में आपका स्वागत है। यह एक आधुनिक, उच्च-गुणवत्ता वाला टेक्स्ट-टू-स्पीच एप्लिकेशन है। यहाँ आप अपने लेख को प्राकृतिक हिंदी आवाज़ में बदल सकते हैं, गति और पिच को सटीक रूप से समायोजित कर सकते हैं, तथा उच्च रिज़ॉल्यूशन MP3 या वीडियो कतार में एक्सपोर्ट कर सकते हैं।";
+      
+      ['dark', 'light'].forEach(t => {
+        const area = document.getElementById(`${t}TextInput`);
+        area.value = sample;
+        handleTextInput(t, sample);
+      });
+    }
+
+    // Refresh animation simulation
+    function triggerRefreshAnimation(btn) {
+      btn.style.transform = 'rotate(360deg)';
+      btn.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      setTimeout(() => {
+        btn.style.transform = 'none';
+        btn.style.transition = 'none';
+      }, 550);
+    }
+
+    // Toggle Simulated Focus Ring
+    let focusRingOn = false;
+    function toggleFocusRingDemo() {
+      focusRingOn = !focusRingOn;
+      const activeNavItems = document.querySelectorAll('.sidebar-nav-item.active');
+      activeNavItems.forEach(el => {
+        if (focusRingOn) {
+          el.classList.add('focus-ring-active');
+        } else {
+          el.classList.remove('focus-ring-active');
+        }
+      });
+    }
+
+    // Modal logic
+    function openTokensModal() {
+      document.getElementById('tokensModal').classList.add('open');
+    }
+    function closeTokensModal() {
+      document.getElementById('tokensModal').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeTokensModal();
+    });
+
+    // Initialize initial slider percentages
+    updateSlider('dark', 'rate', 0);
+    updateSlider('dark', 'pitch', 0);
+    updateSlider('light', 'rate', 0);
+    updateSlider('light', 'pitch', 0);
+  </script>
+</body>
+</html>
